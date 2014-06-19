@@ -41,6 +41,7 @@ public class ServerRunner extends JPanel implements ActionListener {
     private BufferedWriter logWriter;
     
     public final static Dimension WINDOW_DIMENSIONS = new Dimension(800, 500);
+    public final static String greeting = "Running server GUI. Type \"/server start\" to begin.";
 
 	public ServerRunner() {
 		super(new BorderLayout());
@@ -68,6 +69,13 @@ public class ServerRunner extends JPanel implements ActionListener {
         add(scrollPane, BorderLayout.NORTH);
         
         add(serverText, BorderLayout.LINE_START);
+        
+        try {
+			doc.insertString(doc.getLength(), greeting, doc.getStyle("comment"));
+		} catch (BadLocationException e) {
+			System.out.println("\nCannot display input\n");
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) {
