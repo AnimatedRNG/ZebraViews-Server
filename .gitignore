@@ -5,6 +5,7 @@
 
 # Build files
 bin/
+jar/
 
 # Package Files #
 #*.jar

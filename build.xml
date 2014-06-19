@@ -35,6 +35,14 @@
             <classpath refid="ZebraViews-Server.classpath"/>
         </javac>
     </target>
+    <target name="jar">
+        <mkdir dir="bin/jar" />
+        <jar destfile="jar/ZebraViews-Server.jar" basedir="bin">
+            <manifest>
+                <attribute name="Main-Class" value="zebradev.zebraviews.server.ServerRunner" />
+            </manifest>
+        </jar>
+    </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
     <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
         <copy todir="${ant.library.dir}">
