@@ -36,7 +36,7 @@
         </javac>
     </target>
     <target name="jar">
-        <mkdir dir="bin/jar" />
+        <mkdir dir="jar" />
         <jar destfile="jar/ZebraViews-Server.jar" basedir="bin">
             <manifest>
                 <attribute name="Main-Class" value="zebradev.zebraviews.server.ServerRunner" />
