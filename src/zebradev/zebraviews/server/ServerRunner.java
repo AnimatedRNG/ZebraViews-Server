@@ -43,7 +43,7 @@ public class ServerRunner extends JPanel implements ActionListener {
 		serverText = new JTextField(80);
         serverText.addActionListener(this);
         
-        JTextPane textPane = new JTextPane();
+        textPane = new JTextPane();
         textPane.setPreferredSize(new Dimension(this.getPreferredSize().width, this.getPreferredSize().height - 30));
 		doc = textPane.getStyledDocument();
 		addStylesToDocument(doc);
