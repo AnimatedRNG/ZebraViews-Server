@@ -5,6 +5,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -33,6 +38,7 @@ public class ServerRunner extends JPanel implements ActionListener {
 	private JTextField serverText;
     private JTextPane textPane;
     private StyledDocument doc;
+    private BufferedWriter logWriter;
     
     public final static Dimension WINDOW_DIMENSIONS = new Dimension(800, 500);
 
@@ -42,6 +48,14 @@ public class ServerRunner extends JPanel implements ActionListener {
 		
 		serverText = new JTextField(80);
         serverText.addActionListener(this);
+        
+        try {
+			logWriter = new BufferedWriter(new FileWriter("ZebraViews-Server_" + 
+			new SimpleDateFormat("yyyyMMddhhmm").format(new Date()) + ".log"));
+		} catch (IOException e) {
+			System.out.println("\nUnable to make log file\n");
+			e.printStackTrace();
+		}
         
         textPane = new JTextPane();
         textPane.setPreferredSize(new Dimension(this.getPreferredSize().width, this.getPreferredSize().height - 30));
@@ -110,9 +124,15 @@ public class ServerRunner extends JPanel implements ActionListener {
 				style = doc.getStyle("comment");
 				text = "//" + text;
 			}
-			doc.insertString(doc.getLength(), text + '\n', style);
+			doc.insertString(doc.getLength(), text += '\n', style);
+			logWriter.write(text);
+			logWriter.flush();
 		} catch (BadLocationException e) {
-			System.out.println("Cannot display input");
+			System.out.println("\nCannot display input\n");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("\nIO error\n");
+			e.printStackTrace();
 		}
         serverText.setText("");
 	}
