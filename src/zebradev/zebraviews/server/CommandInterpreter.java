@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 
 public class CommandInterpreter {
