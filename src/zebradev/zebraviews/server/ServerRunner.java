@@ -37,13 +37,13 @@ public class ServerRunner extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 5287650080137085404L;
 	
 	private JTextField serverText;
-    private JTextPane textPane;
-    private StyledDocument doc;
-    private BufferedWriter logWriter;
-    private CommandInterpreter interpreter;
-    
-    public final static Dimension WINDOW_DIMENSIONS = new Dimension(800, 500);
-    public final static String greeting = "Running server GUI. Type \"/server start\" to begin.\n";
+	private JTextPane textPane;
+	private StyledDocument doc;
+	private BufferedWriter logWriter;
+	private CommandInterpreter interpreter;
+	
+	public final static Dimension WINDOW_DIMENSIONS = new Dimension(800, 500);
+	public final static String greeting = "Running server GUI. Type \"/server start\" to begin.\n";
 
 	public ServerRunner() {
 		super(new BorderLayout());
