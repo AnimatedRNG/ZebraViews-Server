@@ -19,7 +19,7 @@ public class CommandInterpreter {
 		CommandInterpreter.log = log;
 	}
 	
-	public void interpret(String input) throws BadLocationException, IOException {
+	public void interpret(String input) {
 		if (input.charAt(1) == 's')
 		{
 			String command = input.substring(8);
