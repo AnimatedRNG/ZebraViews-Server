@@ -26,6 +26,7 @@ public class CommandInterpreter {
 			if (command.equals(ServerCommands.START.toString()))
 			{
 				CommandInterpreter.standardLog(START_RESPONSE);
+				new Thread(new RequestManager()).start();
 			}
 			// Handle other possible responses in if/else blocks
 		}
