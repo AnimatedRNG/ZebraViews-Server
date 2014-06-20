@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JFrame;
@@ -39,9 +40,10 @@ public class ServerRunner extends JPanel implements ActionListener {
     private JTextPane textPane;
     private StyledDocument doc;
     private BufferedWriter logWriter;
+    private CommandInterpreter interpreter;
     
     public final static Dimension WINDOW_DIMENSIONS = new Dimension(800, 500);
-    public final static String greeting = "Running server GUI. Type \"/server start\" to begin.";
+    public final static String greeting = "Running server GUI. Type \"/server start\" to begin.\n";
 
 	public ServerRunner() {
 		super(new BorderLayout());
@@ -69,6 +71,8 @@ public class ServerRunner extends JPanel implements ActionListener {
         add(scrollPane, BorderLayout.NORTH);
         
         add(serverText, BorderLayout.LINE_START);
+        
+		this.interpreter = new CommandInterpreter(doc, logWriter);
         
         try {
 			doc.insertString(doc.getLength(), greeting, doc.getStyle("comment"));
@@ -107,10 +111,16 @@ public class ServerRunner extends JPanel implements ActionListener {
         Style s = doc.addStyle("client", regular);
         StyleConstants.setItalic(s, true);
         StyleConstants.setForeground(s, Color.BLUE);
+        
+        /*s = doc.addStyle("client_response", regular);
+        StyleConstants.setForeground(s, Color.BLUE);*/
  
         s = doc.addStyle("server", regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s, Color.MAGENTA);
+        
+        /*s = doc.addStyle("server_response", regular);
+        StyleConstants.setForeground(s, Color.MAGENTA);*/
         
         s = doc.addStyle("comment", regular);
         StyleConstants.setForeground(s, Color.GREEN);
@@ -122,19 +132,20 @@ public class ServerRunner extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		try {
 			String text = serverText.getText();
-			Style style;
+			String style;
 			if (text.length() >= 7 && text.substring(0, 7).equals("/server"))
-				style = doc.getStyle("server");
+				style = "server";
 			else if (text.length() >= 7 && text.substring(0, 7).equals("/client"))
-				style = doc.getStyle("client");
+				style = "client";
 			else
 			{
-				style = doc.getStyle("comment");
+				style = "comment";
 				text = "//" + text;
 			}
-			doc.insertString(doc.getLength(), text += '\n', style);
-			logWriter.write(text);
-			logWriter.flush();
+			ServerRunner.log(doc, logWriter, text, style);
+			
+			if (!text.substring(0, 2).equals("//"))
+				interpreter.interpret(text);
 		} catch (BadLocationException e) {
 			System.out.println("\nCannot display input\n");
 			e.printStackTrace();
@@ -143,6 +154,16 @@ public class ServerRunner extends JPanel implements ActionListener {
 			e.printStackTrace();
 		}
         serverText.setText("");
+	}
+	
+	public synchronized static void log(StyledDocument doc, BufferedWriter log,
+			String text, String styleName) throws BadLocationException, IOException {
+		Style style = doc.getStyle(styleName);
+		String timeStamp = new SimpleDateFormat("HH:mm:ss-yyyy/MM/dd").format(Calendar.getInstance().getTime());
+		doc.insertString(doc.getLength(), timeStamp	+ ": ",	style);
+		doc.insertString(doc.getLength(), text + '\n', style);
+		log.write(timeStamp + ": " + text + '\n');
+		log.flush();
 	}
 
 }
