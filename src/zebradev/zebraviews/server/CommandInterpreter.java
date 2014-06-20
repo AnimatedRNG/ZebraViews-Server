@@ -20,13 +20,13 @@ public class CommandInterpreter {
 	}
 	
 	public void interpret(String input) throws BadLocationException, IOException {
-		Style style = doc.getStyle("regular");
+		String styleName = "regular";
 		if (input.charAt(1) == 's')
 		{
 			String command = input.substring(8);
 			if (command.equals(ServerCommands.START.toString()))
 			{
-				ServerRunner.log(this.doc, this.log, START_RESPONSE, "regular");
+				ServerRunner.log(this.doc, this.log, START_RESPONSE, styleName);
 			}
 			// Handle other possible responses in if/else blocks
 		}
