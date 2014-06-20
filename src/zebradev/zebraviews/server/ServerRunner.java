@@ -50,31 +50,31 @@ public class ServerRunner extends JPanel implements ActionListener {
 		this.setPreferredSize(ServerRunner.WINDOW_DIMENSIONS);
 		
 		serverText = new JTextField(80);
-        serverText.addActionListener(this);
+		serverText.addActionListener(this);
         
-        try {
+		try {
 			logWriter = new BufferedWriter(new FileWriter("ZebraViews-Server_" + 
 			new SimpleDateFormat("yyyyMMddhhmm").format(new Date()) + ".log"));
 		} catch (IOException e) {
 			System.out.println("\nUnable to make log file\n");
 			e.printStackTrace();
 		}
-        
-        textPane = new JTextPane();
-        textPane.setPreferredSize(new Dimension(this.getPreferredSize().width, this.getPreferredSize().height - 30));
+		
+		textPane = new JTextPane();
+		textPane.setPreferredSize(new Dimension(this.getPreferredSize().width, this.getPreferredSize().height - 30));
 		doc = textPane.getStyledDocument();
 		addStylesToDocument(doc);
 		textPane.setEditable(false);
         
-        JScrollPane scrollPane = new JScrollPane(textPane);
+		JScrollPane scrollPane = new JScrollPane(textPane);
 
-        add(scrollPane, BorderLayout.NORTH);
+		add(scrollPane, BorderLayout.NORTH);
         
-        add(serverText, BorderLayout.LINE_START);
+		add(serverText, BorderLayout.LINE_START);
         
 		this.interpreter = new CommandInterpreter(doc, logWriter);
-        
-        try {
+		
+		try {
 			doc.insertString(doc.getLength(), greeting, doc.getStyle("comment"));
 		} catch (BadLocationException e) {
 			System.out.println("\nCannot display input\n");
@@ -93,39 +93,39 @@ public class ServerRunner extends JPanel implements ActionListener {
 	
 	private static void initGUI() {
 		JFrame frame = new JFrame("ZebraViews-Server");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        frame.add(new ServerRunner());
-        
-        frame.pack();
-        frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		frame.add(new ServerRunner());
+		
+		frame.pack();
+		frame.setVisible(true);
 	}
 	
 	protected void addStylesToDocument(StyledDocument doc) {
-        Style def = StyleContext.getDefaultStyleContext().
-                        getStyle(StyleContext.DEFAULT_STYLE);
- 
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "SansSerif");
- 
-        Style s = doc.addStyle("client", regular);
-        StyleConstants.setItalic(s, true);
-        StyleConstants.setForeground(s, Color.BLUE);
-        
-        /*s = doc.addStyle("client_response", regular);
-        StyleConstants.setForeground(s, Color.BLUE);*/
- 
-        s = doc.addStyle("server", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setForeground(s, Color.MAGENTA);
-        
-        /*s = doc.addStyle("server_response", regular);
-        StyleConstants.setForeground(s, Color.MAGENTA);*/
-        
-        s = doc.addStyle("comment", regular);
-        StyleConstants.setForeground(s, Color.GREEN);
-        
-        // Adding more later
+		Style def = StyleContext.getDefaultStyleContext().
+						getStyle(StyleContext.DEFAULT_STYLE);
+		
+		Style regular = doc.addStyle("regular", def);
+		StyleConstants.setFontFamily(def, "SansSerif");
+		
+		Style s = doc.addStyle("client", regular);
+		StyleConstants.setItalic(s, true);
+		StyleConstants.setForeground(s, Color.BLUE);
+		
+		/*s = doc.addStyle("client_response", regular);
+		StyleConstants.setForeground(s, Color.BLUE);*/
+		
+		s = doc.addStyle("server", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setForeground(s, Color.MAGENTA);
+		
+		/*s = doc.addStyle("server_response", regular);
+		StyleConstants.setForeground(s, Color.MAGENTA);*/
+		
+		s = doc.addStyle("comment", regular);
+		StyleConstants.setForeground(s, Color.GREEN);
+		
+		// Adding more later
     }
 
 	@Override
@@ -153,7 +153,7 @@ public class ServerRunner extends JPanel implements ActionListener {
 			System.out.println("\nIO error\n");
 			e.printStackTrace();
 		}
-        serverText.setText("");
+		serverText.setText("");
 	}
 	
 	public synchronized static void log(StyledDocument doc, BufferedWriter log,
