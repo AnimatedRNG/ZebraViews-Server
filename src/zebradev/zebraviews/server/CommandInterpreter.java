@@ -9,30 +9,41 @@ import javax.swing.text.StyledDocument;
 
 public class CommandInterpreter {
 
-	private StyledDocument doc;
-	private BufferedWriter log;
+	private static StyledDocument doc;
+	private static BufferedWriter log;
 	
 	public static final String START_RESPONSE = "Starting server....";
 	
 	public CommandInterpreter(StyledDocument doc, BufferedWriter log) {
-		this.doc = doc;
-		this.log = log;
+		CommandInterpreter.doc = doc;
+		CommandInterpreter.log = log;
 	}
 	
 	public void interpret(String input) throws BadLocationException, IOException {
-		String styleName = "regular";
 		if (input.charAt(1) == 's')
 		{
 			String command = input.substring(8);
 			if (command.equals(ServerCommands.START.toString()))
 			{
-				ServerRunner.log(this.doc, this.log, START_RESPONSE, styleName);
+				CommandInterpreter.standardLog(START_RESPONSE);
 			}
 			// Handle other possible responses in if/else blocks
 		}
 		else
 		{
 			// Fake client handling
+		}
+	}
+	
+	public static synchronized void standardLog(String text) {
+		try {
+			ServerRunner.log(doc, log, text, "regular");
+		} catch (BadLocationException e) {
+			System.out.println("\nCannot display input\n");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("\nIO error\n");
+			e.printStackTrace();
 		}
 	}
 }
