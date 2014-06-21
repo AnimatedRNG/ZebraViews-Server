@@ -29,7 +29,6 @@ public class ConfigManager extends HashMap<String, String> {
 		ConfigHandler(HashMap<String, String> config, String elementName) {
 			this.config = config;
 			this.elementName = elementName;
-			System.out.println(elementName);
 		}
 		
 		@Override
