@@ -24,7 +24,6 @@ public class CommandInterpreter {
 						return;
 					}
 					this.manager = new RequestManager();
-					new Thread(manager).start();
 				} catch (Exception e) {
 					Log.error("Config files error!", e);
 					Log.info("Stopping server....");
