@@ -1,8 +1,5 @@
 package zebradev.zebraviews.server;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import com.esotericsoftware.minlog.Log;
 
 public class CommandInterpreter {
@@ -29,10 +26,6 @@ public class CommandInterpreter {
 				} catch (Exception e) {
 					Log.error("Config files error!", e);
 					Log.info("Stopping server....");
-					
-					//StringWriter errors = new StringWriter();
-					//e.printStackTrace(new PrintWriter(errors));
-					//Log.error(errors.toString());
 					return;
 				}
 			}

@@ -9,7 +9,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JFrame;
@@ -156,7 +155,6 @@ public class ServerRunner extends JPanel implements ActionListener {
 		{
 			style = "comment";
 		}
-		//ServerRunner.log(text, style);
 		Log.info(style, text);
 		
 		if (!text.substring(0, 2).equals("//"))
