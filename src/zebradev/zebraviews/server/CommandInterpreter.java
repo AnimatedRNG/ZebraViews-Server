@@ -1,25 +1,15 @@
 package zebradev.zebraviews.server;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.StyledDocument;
+import com.esotericsoftware.minlog.Log;
 
 public class CommandInterpreter {
 
-	private static StyledDocument doc;
-	private static BufferedWriter log;
 	private RequestManager manager;
 	
 	public static final String START_RESPONSE = "Starting server....";
-	
-	public CommandInterpreter(StyledDocument doc, BufferedWriter log) {
-		CommandInterpreter.doc = doc;
-		CommandInterpreter.log = log;
-	}
 	
 	public void interpret(String input) {
 		if (input.charAt(1) == 's')
@@ -30,19 +20,19 @@ public class CommandInterpreter {
 				try {
 					if (manager != null)
 					{
-						CommandInterpreter.standardLog("Server already running!");
+						Log.warn("Server already running!");
 						return;
 					}
-					CommandInterpreter.standardLog(START_RESPONSE);
+					Log.info(START_RESPONSE);
 					this.manager = new RequestManager();
 					new Thread(manager).start();
 				} catch (Exception e) {
-					CommandInterpreter.standardLog("Config files error!");
-					CommandInterpreter.standardLog("Stopping server....");
+					Log.error("Config files error!", e);
+					Log.info("Stopping server....");
 					
-					StringWriter errors = new StringWriter();
-					e.printStackTrace(new PrintWriter(errors));
-					CommandInterpreter.standardLog(errors.toString());
+					//StringWriter errors = new StringWriter();
+					//e.printStackTrace(new PrintWriter(errors));
+					//Log.error(errors.toString());
 					return;
 				}
 			}
@@ -50,12 +40,13 @@ public class CommandInterpreter {
 			{
 				if (this.manager != null && !this.manager.stop)
 				{
+					Log.info("Stopping server....");
 					this.manager.stop();
-					CommandInterpreter.standardLog("Server stopped");
+					Log.info("Server stopped");
 				}
 				else
 				{
-					CommandInterpreter.standardLog("Server not running!");
+					Log.warn("Server not running!");
 					return;
 				}
 			}
@@ -64,18 +55,6 @@ public class CommandInterpreter {
 		else
 		{
 			// Fake client handling
-		}
-	}
-	
-	public static synchronized void standardLog(String text) {
-		try {
-			ServerRunner.log(doc, log, text, "regular");
-		} catch (BadLocationException e) {
-			System.out.println("\nCannot display input\n");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.out.println("\nIO error\n");
-			e.printStackTrace();
 		}
 	}
 }

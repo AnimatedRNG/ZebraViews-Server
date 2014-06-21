@@ -23,6 +23,8 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import com.esotericsoftware.minlog.Log;
+
 /*
  * Runner class; handles the server's GUI.
  * 
@@ -38,8 +40,8 @@ public class ServerRunner extends JPanel implements ActionListener {
 	
 	private JTextField serverText;
 	private JTextPane textPane;
-	private StyledDocument doc;
-	private BufferedWriter logWriter;
+	public static StyledDocument DOC;
+	public static BufferedWriter LOG;
 	private CommandInterpreter interpreter;
 	
 	public final static Dimension WINDOW_DIMENSIONS = new Dimension(800, 500);
@@ -53,7 +55,7 @@ public class ServerRunner extends JPanel implements ActionListener {
 		serverText.addActionListener(this);
         
 		try {
-			logWriter = new BufferedWriter(new FileWriter("ZebraViews-Server_" + 
+			LOG = new BufferedWriter(new FileWriter("ZebraViews-Server_" + 
 			new SimpleDateFormat("yyyyMMddhhmm").format(new Date()) + ".log"));
 		} catch (IOException e) {
 			System.out.println("\nUnable to make log file\n");
@@ -62,8 +64,8 @@ public class ServerRunner extends JPanel implements ActionListener {
 		
 		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(this.getPreferredSize().width, this.getPreferredSize().height - 30));
-		doc = textPane.getStyledDocument();
-		addStylesToDocument(doc);
+		DOC = textPane.getStyledDocument();
+		addStylesToDocument(DOC);
 		textPane.setEditable(false);
         
 		JScrollPane scrollPane = new JScrollPane(textPane);
@@ -72,14 +74,16 @@ public class ServerRunner extends JPanel implements ActionListener {
         
 		add(serverText, BorderLayout.LINE_START);
         
-		this.interpreter = new CommandInterpreter(doc, logWriter);
+		this.interpreter = new CommandInterpreter();
 		
 		try {
-			doc.insertString(doc.getLength(), greeting, doc.getStyle("comment"));
+			DOC.insertString(DOC.getLength(), greeting, DOC.getStyle("comment"));
 		} catch (BadLocationException e) {
 			System.out.println("\nCannot display input\n");
 			e.printStackTrace();
 		}
+		
+		Log.setLogger(new ZebraLogger());
 	}
 	
 	public static void main(String[] args) {
@@ -112,15 +116,27 @@ public class ServerRunner extends JPanel implements ActionListener {
 		StyleConstants.setItalic(s, true);
 		StyleConstants.setForeground(s, Color.BLUE);
 		
-		/*s = doc.addStyle("client_response", regular);
-		StyleConstants.setForeground(s, Color.BLUE);*/
-		
 		s = doc.addStyle("server", regular);
 		StyleConstants.setBold(s, true);
 		StyleConstants.setForeground(s, Color.MAGENTA);
 		
-		/*s = doc.addStyle("server_response", regular);
-		StyleConstants.setForeground(s, Color.MAGENTA);*/
+		s = doc.addStyle("error", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setForeground(s, Color.RED);
+		
+		s = doc.addStyle("warning", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setForeground(s, Color.YELLOW);
+		
+		s = doc.addStyle("info", regular);
+		StyleConstants.setForeground(s, Color.BLACK);
+		
+		s = doc.addStyle("debug", regular);
+		StyleConstants.setItalic(s, true);
+		StyleConstants.setForeground(s, Color.CYAN);
+		
+		s = doc.addStyle("trace", regular);
+		StyleConstants.setForeground(s, Color.CYAN);
 		
 		s = doc.addStyle("comment", regular);
 		StyleConstants.setForeground(s, Color.GREEN);
@@ -130,40 +146,31 @@ public class ServerRunner extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		try {
-			String text = serverText.getText();
-			String style;
-			if (text.length() >= 7 && text.substring(0, 7).equals("/server"))
-				style = "server";
-			else if (text.length() >= 7 && text.substring(0, 7).equals("/client"))
-				style = "client";
-			else
-			{
-				style = "comment";
-				text = "//" + text;
-			}
-			ServerRunner.log(doc, logWriter, text, style);
-			
-			if (!text.substring(0, 2).equals("//"))
-				interpreter.interpret(text);
-		} catch (BadLocationException e) {
-			System.out.println("\nCannot display input\n");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.out.println("\nIO error\n");
-			e.printStackTrace();
+		String text = serverText.getText();
+		String style;
+		if (text.length() >= 7 && text.substring(0, 7).equals("/server"))
+			style = "server";
+		else if (text.length() >= 7 && text.substring(0, 7).equals("/client"))
+			style = "client";
+		else
+		{
+			style = "comment";
 		}
+		//ServerRunner.log(text, style);
+		Log.info(style, text);
+		
+		if (!text.substring(0, 2).equals("//"))
+			interpreter.interpret(text);
 		serverText.setText("");
 	}
 	
-	public synchronized static void log(StyledDocument doc, BufferedWriter log,
-			String text, String styleName) throws BadLocationException, IOException {
-		Style style = doc.getStyle(styleName);
+	public synchronized static void log(String text, String styleName) throws BadLocationException, IOException {
+		Style style = DOC.getStyle(styleName);
 		String timeStamp = new SimpleDateFormat("HH:mm:ss-yyyy/MM/dd").format(Calendar.getInstance().getTime());
-		doc.insertString(doc.getLength(), timeStamp	+ ": ",	style);
-		doc.insertString(doc.getLength(), text + '\n', style);
-		log.write(timeStamp + ": " + text + '\n');
-		log.flush();
+		DOC.insertString(DOC.getLength(), timeStamp	+ ": ",	style);
+		DOC.insertString(DOC.getLength(), text + '\n', style);
+		LOG.write(timeStamp + ": " + text + '\n');
+		LOG.flush();
 	}
 
 }
