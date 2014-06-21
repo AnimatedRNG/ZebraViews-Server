@@ -14,11 +14,13 @@ import org.xml.sax.helpers.DefaultHandler;
 public class ConfigManager extends HashMap<String, String> {
 
 	private static final long serialVersionUID = 8468298958064604185L;
+	private String elementName;
 	
-	public ConfigManager(String fileName) throws ParserConfigurationException, SAXException, IOException {
+	public ConfigManager(String fileName, String elementName) throws ParserConfigurationException, SAXException, IOException {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser saxParser = factory.newSAXParser();
 		saxParser.parse(RequestManager.CONFIG_FILE, new ConfigHandler(this));
+		this.elementName = elementName;
 	}
 	
 	private class ConfigHandler extends DefaultHandler {
@@ -31,7 +33,7 @@ public class ConfigManager extends HashMap<String, String> {
 		
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-			if (!qName.equals("ZebraViews"))
+			if (!qName.equals(elementName))
 				throw new SAXException("Incorrect XML file");
 			for (int a = 0; a < attributes.getLength(); a++)
 				config.put(attributes.getQName(a), attributes.getValue(a));

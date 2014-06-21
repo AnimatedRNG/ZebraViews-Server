@@ -12,7 +12,7 @@ public class RequestManager implements Runnable {
 	private ConfigManager handler;
 	
 	public RequestManager() throws IOException, ParserConfigurationException, SAXException {
-		this.handler = new ConfigManager(CONFIG_FILE);
+		this.handler = new ConfigManager(CONFIG_FILE, "ZebraViews");
 	}
 	
 	@Override
