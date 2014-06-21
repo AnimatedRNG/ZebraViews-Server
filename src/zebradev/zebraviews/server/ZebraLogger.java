@@ -15,7 +15,7 @@ import com.esotericsoftware.minlog.Log.Logger;
 public class ZebraLogger extends Logger {
 
 	@Override
-	public void log(int level, String category, String message, Throwable ex)
+	public synchronized void log(int level, String category, String message, Throwable ex)
 	{
 		Style style = null;
 		
