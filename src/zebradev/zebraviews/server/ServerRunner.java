@@ -157,7 +157,7 @@ public class ServerRunner extends JPanel implements ActionListener {
 		}
 		Log.info(style, text);
 		
-		if (!text.substring(0, 2).equals("//"))
+		if (!style.equals("comment"))
 			interpreter.interpret(text);
 		serverText.setText("");
 	}
