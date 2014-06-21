@@ -7,6 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.minlog.Log;
 
 public class RequestManager implements Runnable {
 
@@ -22,6 +23,8 @@ public class RequestManager implements Runnable {
 		this.zebraViewsServer = new Server();
 	    zebraViewsServer.start();
 	    zebraViewsServer.bind(port);
+	    
+	    Log.info("Server started on port " + port);
 	}
 	
 	@Override

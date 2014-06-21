@@ -6,8 +6,6 @@ public class CommandInterpreter {
 
 	private RequestManager manager;
 	
-	public static final String START_RESPONSE = "Starting server....";
-	
 	public void interpret(String input) {
 		if (input.charAt(1) == 's')
 		{
@@ -25,7 +23,6 @@ public class CommandInterpreter {
 						Log.warn("Server already running!");
 						return;
 					}
-					Log.info(START_RESPONSE);
 					this.manager = new RequestManager();
 					new Thread(manager).start();
 				} catch (Exception e) {
