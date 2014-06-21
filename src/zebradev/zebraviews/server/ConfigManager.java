@@ -1,7 +1,7 @@
 package zebradev.zebraviews.server;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Hashtable;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -11,7 +11,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class ConfigManager extends HashMap<String, String> {
+public class ConfigManager extends Hashtable<String, String> {
 
 	private static final long serialVersionUID = 8468298958064604185L;
 	
@@ -23,10 +23,10 @@ public class ConfigManager extends HashMap<String, String> {
 	
 	private class ConfigHandler extends DefaultHandler {
 		
-		private HashMap<String, String> config;
+		private Hashtable<String, String> config;
 		private String elementName;
 		
-		ConfigHandler(HashMap<String, String> config, String elementName) {
+		ConfigHandler(Hashtable<String, String> config, String elementName) {
 			this.config = config;
 			this.elementName = elementName;
 		}
