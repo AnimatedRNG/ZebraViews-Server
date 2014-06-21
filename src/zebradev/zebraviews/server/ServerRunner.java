@@ -163,14 +163,4 @@ public class ServerRunner extends JPanel implements ActionListener {
 			interpreter.interpret(text);
 		serverText.setText("");
 	}
-	
-	public synchronized static void log(String text, String styleName) throws BadLocationException, IOException {
-		Style style = DOC.getStyle(styleName);
-		String timeStamp = new SimpleDateFormat("HH:mm:ss-yyyy/MM/dd").format(Calendar.getInstance().getTime());
-		DOC.insertString(DOC.getLength(), timeStamp	+ ": ",	style);
-		DOC.insertString(DOC.getLength(), text + '\n', style);
-		LOG.write(timeStamp + ": " + text + '\n');
-		LOG.flush();
-	}
-
 }
