@@ -11,6 +11,11 @@ public class CommandInterpreter {
 	public void interpret(String input) {
 		if (input.charAt(1) == 's')
 		{
+			if (input.length() < 8)
+			{
+				Log.error("Missing arguments");
+				return;
+			}
 			String command = input.substring(8);
 			if (command.equals(ServerCommands.START.toString()))
 			{
