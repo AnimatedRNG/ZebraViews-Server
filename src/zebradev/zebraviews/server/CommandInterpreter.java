@@ -4,7 +4,7 @@ import com.esotericsoftware.minlog.Log;
 
 public class CommandInterpreter {
 
-	private RequestManager manager;
+	private ServerManager manager;
 	
 	public void interpret(String input) {
 		if (input.charAt(1) == 's')
@@ -23,7 +23,7 @@ public class CommandInterpreter {
 						Log.warn("Server already running!");
 						return;
 					}
-					this.manager = new RequestManager();
+					this.manager = new ServerManager();
 				} catch (Exception e) {
 					Log.error("Config files error!", e);
 					Log.info("Stopping server....");
