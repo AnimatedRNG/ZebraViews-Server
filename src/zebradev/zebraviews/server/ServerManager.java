@@ -12,7 +12,7 @@ import com.esotericsoftware.minlog.Log;
 
 public class ServerManager {
 
-	public final static String CONFIG_FILE = "config/config.xml"; 
+	public final static String CONFIG_FILE = "config/server_config.xml"; 
 	private ConfigManager handler;
 	private Server zebraViewsServer;
 	public boolean stop;
@@ -25,7 +25,7 @@ public class ServerManager {
 	    new Thread(zebraViewsServer).start();
 	    zebraViewsServer.bind(port);
 	    
-	    zebraViewsServer.addListener(new ThreadedListener(new RequestListener()));
+	    zebraViewsServer.addListener(new ThreadedListener(new ServerRequestListener()));
 	    
 	    Log.info("Server started on port " + port);
 	}
