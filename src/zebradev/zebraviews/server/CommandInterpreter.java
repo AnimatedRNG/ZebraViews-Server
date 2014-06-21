@@ -12,6 +12,7 @@ public class CommandInterpreter {
 
 	private static StyledDocument doc;
 	private static BufferedWriter log;
+	private RequestManager manager;
 	
 	public static final String START_RESPONSE = "Starting server....";
 	
@@ -26,9 +27,15 @@ public class CommandInterpreter {
 			String command = input.substring(8);
 			if (command.equals(ServerCommands.START.toString()))
 			{
-				CommandInterpreter.standardLog(START_RESPONSE);
 				try {
-					new Thread(new RequestManager()).start();
+					if (manager != null)
+					{
+						CommandInterpreter.standardLog("Server already running!");
+						return;
+					}
+					CommandInterpreter.standardLog(START_RESPONSE);
+					this.manager = new RequestManager();
+					new Thread(manager).start();
 				} catch (Exception e) {
 					CommandInterpreter.standardLog("Config files error!");
 					CommandInterpreter.standardLog("Stopping server....");
@@ -36,6 +43,19 @@ public class CommandInterpreter {
 					StringWriter errors = new StringWriter();
 					e.printStackTrace(new PrintWriter(errors));
 					CommandInterpreter.standardLog(errors.toString());
+					return;
+				}
+			}
+			else if (command.equals(ServerCommands.STOP.toString()))
+			{
+				if (this.manager != null && !this.manager.stop)
+				{
+					this.manager.stop();
+					CommandInterpreter.standardLog("Server stopped");
+				}
+				else
+				{
+					CommandInterpreter.standardLog("Server not running!");
 					return;
 				}
 			}

@@ -1,5 +1,8 @@
 <?xml version='1.0' encoding='us-ascii'?>
+
+<!-- Using tester port for now -->
+
 <ZebraViews 
-    test="a"
-    >
+	port="54321"
+	>
 </ZebraViews>
