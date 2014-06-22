@@ -12,13 +12,14 @@ import com.esotericsoftware.minlog.Log;
 
 public class ServerManager {
 
-	public final static String CONFIG_FILE = "config/server_config.xml"; 
+	public final static String CONFIG_FILE = "config/server_config.xml";
+	public final static String CONFIG_ELEMENT = "Server";
 	private ConfigManager handler;
 	private Server zebraViewsServer;
 	public boolean stop;
 	
 	public ServerManager() throws IOException, ParserConfigurationException, SAXException {
-		this.handler = new ConfigManager(CONFIG_FILE, "ZebraViews");
+		this.handler = new ConfigManager(CONFIG_FILE, CONFIG_ELEMENT);
 		int port = Integer.parseInt(handler.get("port"));
 		
 		this.zebraViewsServer = new Server();

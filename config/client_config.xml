@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='us-ascii'?>
+
+<Client 
+	timeout="5000"
+	>
+</Client>

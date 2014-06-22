@@ -3,8 +3,8 @@
 <!-- Using tester port for now -->
 <!-- Use localhost to test on your own computer -->
 
-<ZebraViews 
+<Server 
 	port="54321"
 	server_ip="localhost"
 	>
-</ZebraViews>
+</Server>
