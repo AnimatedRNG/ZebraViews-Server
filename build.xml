@@ -6,7 +6,6 @@
               as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="ZebraViews-Server">
     <property environment="env"/>
-    <property name="ECLIPSE_HOME" value="NOT NEEDED"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
@@ -14,6 +13,7 @@
         <pathelement location="bin"/>
         <pathelement location="lib/kryonet-2.21-all.jar"/>
         <pathelement location="lib/jsoup-1.7.3.jar"/>
+        <pathelement location="build"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -36,6 +36,12 @@
             <classpath refid="ZebraViews-Server.classpath"/>
         </javac>
     </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="ServerRunner">
+        <java classname="zebradev.zebraviews.server.ServerRunner" failonerror="true" fork="yes">
+            <classpath refid="ZebraViews-Server.classpath"/>
+        </java>
+    </target>
     <target name="jar">
         <mkdir dir="jar" />
         <jar destfile="jar/ZebraViews-Server.jar" basedir="bin">
@@ -43,19 +49,5 @@
                 <attribute name="Main-Class" value="zebradev.zebraviews.server.ServerRunner" />
             </manifest>
         </jar>
-    </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-        <copy todir="${ant.library.dir}">
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </copy>
-        <unzip dest="${ant.library.dir}">
-            <patternset includes="jdtCompilerAdapter.jar"/>
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </unzip>
-    </target>
-    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
-        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-        <antcall target="build"/>
     </target>
 </project>
