@@ -18,7 +18,7 @@ public class ConfigManager extends Hashtable<String, String> {
 	public ConfigManager(String fileName, String elementName) throws ParserConfigurationException, SAXException, IOException {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser saxParser = factory.newSAXParser();
-		saxParser.parse(ServerManager.CONFIG_FILE, new ConfigHandler(this, elementName));
+		saxParser.parse(fileName, new ConfigHandler(this, elementName));
 	}
 	
 	private class ConfigHandler extends DefaultHandler {
