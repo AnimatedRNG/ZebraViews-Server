@@ -17,29 +17,42 @@
 
 package zebradev.zebraviews.server;
 
+import java.util.Hashtable;
+
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 
 public class ServerRequestListener extends Listener {
 
+	private Hashtable<Connection, ConnectionManager> connections;
+	
+	public ServerRequestListener() {
+		this.connections = new Hashtable<Connection, ConnectionManager>();
+	}
+	
 	@Override
 	public void connected(Connection connection) {
-		Log.info("Server connected to " + connection.getRemoteAddressTCP());
+		Log.info("Server connected to " + connection);
+		this.connections.put(connection, new ConnectionManager(connection));
 	}
 	
 	@Override
 	public void disconnected(Connection connection) {
-		Log.info("Server disconnected from " + connection.getRemoteAddressTCP());
+		Log.info("Server disconnected from " + connection);
+		this.connections.remove(connection);
 	}
 	
 	@Override
 	public void received(Connection connection, Object object) {
-		Log.info("Server received object from " + connection.getRemoteAddressTCP());
+		Log.info("Server received object from " + connection);
+		
+		if (this.connections.containsKey(connection))
+			Log.debug("Server already connected to this client");
 	}
 	
 	@Override
 	public void idle(Connection connection) {
-		Log.info("Server idle on " + connection.getRemoteAddressTCP());
+		Log.info("Server idle on " + connection);
 	}
 }

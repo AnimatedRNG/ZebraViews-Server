@@ -25,21 +25,21 @@ public class ClientRequestListener extends Listener {
 	
 	@Override
 	public void connected(Connection connection) {
-		Log.info("Client connected to " + connection.getRemoteAddressTCP());
+		Log.info("Client connected to " + connection);
 	}
 	
 	@Override
 	public void disconnected(Connection connection) {
-		Log.info("Client disconnected from " + connection.getRemoteAddressTCP());
+		Log.info("Client disconnected from " + connection);
 	}
 	
 	@Override
 	public void received(Connection connection, Object object) {
-		Log.info("Client received object from " + connection.getRemoteAddressTCP());
+		Log.info("Client received object from " + connection);
 	}
 	
 	@Override
 	public void idle(Connection connection) {
-		Log.info("Client idle on " + connection.getRemoteAddressTCP());
+		Log.info("Client idle on " + connection);
 	}
 }
