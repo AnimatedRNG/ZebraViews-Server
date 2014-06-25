@@ -17,6 +17,7 @@
 
 package zebradev.zebraviews.server;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,33 +26,37 @@ import java.util.Calendar;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
+import javax.swing.text.StyledDocument;
 
 import com.esotericsoftware.minlog.Log;
 import com.esotericsoftware.minlog.Log.Logger;
 
 public class ZebraLogger extends Logger {
-
+	
+	public static StyledDocument DOC;
+	public static BufferedWriter LOG;
+	
 	@Override
 	public synchronized void log(int level, String category, String message, Throwable ex)
 	{
 		Style style = null;
 		
 		switch (level) {
-		case Log.LEVEL_ERROR: style = ServerRunner.DOC.getStyle("error"); break;
-		case Log.LEVEL_WARN: style = ServerRunner.DOC.getStyle("warning"); break;
-		case Log.LEVEL_INFO: style = ServerRunner.DOC.getStyle("info"); break;
-		case Log.LEVEL_DEBUG: style = ServerRunner.DOC.getStyle("debug"); break;
-		case Log.LEVEL_TRACE: style = ServerRunner.DOC.getStyle("trace"); break;
+		case Log.LEVEL_ERROR: style = ZebraLogger.DOC.getStyle("error"); break;
+		case Log.LEVEL_WARN: style = ZebraLogger.DOC.getStyle("warning"); break;
+		case Log.LEVEL_INFO: style = ZebraLogger.DOC.getStyle("info"); break;
+		case Log.LEVEL_DEBUG: style = ZebraLogger.DOC.getStyle("debug"); break;
+		case Log.LEVEL_TRACE: style = ZebraLogger.DOC.getStyle("trace"); break;
 		}
 		
 		if (category != null)
 		{
 			if (category.equals("server"))
-				style = ServerRunner.DOC.getStyle("server");
+				style = ZebraLogger.DOC.getStyle("server");
 			else if (category.equals("client"))
-				style = ServerRunner.DOC.getStyle("client");
+				style = ZebraLogger.DOC.getStyle("client");
 			else if (category.equals("comment"))
-				style = ServerRunner.DOC.getStyle("comment");
+				style = ZebraLogger.DOC.getStyle("comment");
 		}
 		
 		String timeStamp = new SimpleDateFormat("HH:mm:ss-yyyy/MM/dd").format(Calendar.getInstance().getTime());
@@ -79,9 +84,9 @@ public class ZebraLogger extends Logger {
 		String text = builder.toString();
 		
 		try {
-			ServerRunner.DOC.insertString(ServerRunner.DOC.getLength(), text, style);
-			ServerRunner.LOG.write(text);
-			ServerRunner.LOG.flush();
+			ZebraLogger.DOC.insertString(ZebraLogger.DOC.getLength(), text, style);
+			ZebraLogger.LOG.write(text);
+			ZebraLogger.LOG.flush();
 		} catch (BadLocationException e) {
 			System.out.println("\nCannot display output\n");
 			e.printStackTrace();

@@ -57,8 +57,6 @@ public class ServerRunner extends JPanel implements ActionListener {
 	
 	private JTextField serverText;
 	private JTextPane textPane;
-	public static StyledDocument DOC;
-	public static BufferedWriter LOG;
 	private CommandInterpreter interpreter;
 	
 	public final static Dimension WINDOW_DIMENSIONS = new Dimension(800, 500);
@@ -71,8 +69,10 @@ public class ServerRunner extends JPanel implements ActionListener {
 		serverText = new JTextField(80);
 		serverText.addActionListener(this);
         
+		
+		BufferedWriter log = null;
 		try {
-			LOG = new BufferedWriter(new FileWriter("ZebraViews-Server_" + 
+			log = new BufferedWriter(new FileWriter("ZebraViews-Server_" + 
 			new SimpleDateFormat("yyyyMMddhhmm").format(new Date()) + ".log"));
 		} catch (IOException e) {
 			System.out.println("\nUnable to make log file\n");
@@ -81,8 +81,8 @@ public class ServerRunner extends JPanel implements ActionListener {
 		
 		textPane = new JTextPane();
 		textPane.setPreferredSize(new Dimension(this.getPreferredSize().width, this.getPreferredSize().height - 30));
-		DOC = textPane.getStyledDocument();
-		addStylesToDocument(DOC);
+		StyledDocument doc = textPane.getStyledDocument();
+		addStylesToDocument(doc);
 		textPane.setEditable(false);
 		((DefaultCaret)textPane.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         
@@ -95,11 +95,14 @@ public class ServerRunner extends JPanel implements ActionListener {
 		this.interpreter = new CommandInterpreter();
 		
 		try {
-			DOC.insertString(DOC.getLength(), greeting, DOC.getStyle("comment"));
+			doc.insertString(doc.getLength(), greeting, doc.getStyle("comment"));
 		} catch (BadLocationException e) {
 			System.out.println("\nCannot display input\n");
 			e.printStackTrace();
 		}
+		
+		ZebraLogger.LOG = log;
+		ZebraLogger.DOC = doc;
 		
 		Log.setLogger(new ZebraLogger());
 	}
