@@ -46,6 +46,7 @@ public class ServerRequestListener extends Listener {
 	@Override
 	public void received(Connection connection, Object object) {
 		Log.info("Server received object from " + connection);
+		this.connections.get(connection).received(object);
 		
 		if (this.connections.containsKey(connection))
 			Log.debug("Server already connected to this client");
