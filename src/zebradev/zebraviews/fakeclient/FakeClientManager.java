@@ -18,6 +18,7 @@
 package zebradev.zebraviews.fakeclient;
 
 import java.io.IOException;
+import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -26,8 +27,10 @@ import org.xml.sax.SAXException;
 import zebradev.zebraviews.server.ConfigManager;
 import zebradev.zebraviews.server.ServerManager;
 
+import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Listener.ThreadedListener;
+import com.esotericsoftware.minlog.Log;
 
 public class FakeClientManager {
 	private ConfigManager serverConfig;
@@ -55,6 +58,33 @@ public class FakeClientManager {
 		this.zebraViewsClient.connect(timeout, ip, port);
 		
 		this.zebraViewsClient.addListener(new ThreadedListener(new ClientRequestListener()));
+		
+		// Remove this once we add our serializer
+	    Kryo kryo = this.zebraViewsClient.getKryo();
+	    kryo.register(java.util.TreeMap.class);
+	}
+	
+	public synchronized void login(String username, String password) {
+		
+		TreeMap<String, Object> loginRequest = new TreeMap<String, Object>();
+		loginRequest.put("type", "login");
+		loginRequest.put("username", username);
+		loginRequest.put("password", password);
+		
+		Log.info("Client logging in with username " + username + " and password " + password);
+		
+		this.zebraViewsClient.sendTCP(loginRequest);
+	}
+	
+	public synchronized void signup(String username, String password) {
+		TreeMap<String, Object> signupRequest = new TreeMap<String, Object>();
+		signupRequest.put("type", "signup");
+		signupRequest.put("username", username);
+		signupRequest.put("password", password);
+		
+		Log.info("Client signing up in with username " + username + " and password " + password);
+		
+		this.zebraViewsClient.sendTCP(signupRequest);
 	}
 	
 	public synchronized void stop() {

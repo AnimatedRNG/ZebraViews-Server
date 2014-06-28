@@ -17,6 +17,9 @@
 
 package zebradev.zebraviews.server;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import zebradev.zebraviews.fakeclient.ClientCommands;
 import zebradev.zebraviews.fakeclient.FakeClientManager;
 
@@ -34,7 +37,9 @@ public class CommandInterpreter {
 			Log.error("Missing arguments");
 			return;
 		}
-		String command = input.substring(8);
+		
+		String command = input.substring(8, this.getNextWordIndex(7, input));
+		List<String> allArgs = this.getAllArguments(7, input);
 		
 		if (input.charAt(1) == 's')
 		{
@@ -87,20 +92,59 @@ public class CommandInterpreter {
 					return;
 				}
 			}
-			else if (command.equals(ClientCommands.DISCONNECT.toString()))
+			else 
 			{
-				if (this.clientManager != null)
+				if (clientManager == null)
+				{
+					Log.warn("Client not connected!");
+					return;
+				}
+				if (command.equals(ClientCommands.DISCONNECT.toString()))
 				{
 					this.clientManager.stop();
 					this.clientManager = null;
 					Log.info("Client disconnected");
 				}
-				else
+				else if (command.equals(ClientCommands.LOGIN.toString()))
 				{
-					Log.warn("Client not connected!");
-					return;
+					if (allArgs.size() != 3)
+					{
+						Log.error("Incorrect number of arguments");
+						return;
+					}
+					
+					this.clientManager.login(allArgs.get(1), allArgs.get(2));
+				}
+				else if (command.equals(ClientCommands.SIGNUP.toString()))
+				{
+					if (allArgs.size() != 3)
+					{
+						Log.error("Incorrect number of arguments");
+						return;
+					}
+					
+					this.clientManager.signup(allArgs.get(1), allArgs.get(2));
 				}
 			}
 		}
+	}
+	
+	private int getNextWordIndex(int spaceIndex, String string) {
+		int index = spaceIndex + 1;
+		for (; index < string.length() && string.charAt(index) != ' '; index++);
+		return index;
+	}
+	
+	// Gets all command arguments and command name
+	private List<String> getAllArguments(int firstSpaceIndex, String input) {
+		List<String> args = new ArrayList<String>();
+		int newIndex;
+		for (int index = firstSpaceIndex; index < input.length() - 1; index = newIndex)
+		{
+			newIndex = this.getNextWordIndex(index, input);
+			String nextWord = input.substring(index + 1, newIndex);
+			args.add(nextWord);
+		}
+		return args;
 	}
 }

@@ -39,11 +39,20 @@ public class ConnectionManager {
 		}
 		
 		if (type.equals(Requests.LOGIN.value))
+		{
 			this.loggedIn = new DatabaseManager(obj).login();
+			if (this.loggedIn)
+				Log.info("Server successfully authenticated user " + obj.get("username"));
+			else
+				Log.info("Server did not authenticate user " + obj.get("username"));
+		}
 		else if (type.equals(Requests.SIGNUP.value))
 		{
 			if (loggedIn) loggedIn = false;
-			new DatabaseManager(obj).signup();
+			if (new DatabaseManager(obj).signup())
+				Log.info("Server successfully signed up user " + obj.get("username"));
+			else
+				Log.info("Server did not sign up user " + obj.get("username"));
 		}
 		else
 			Log.error("Invalid request " + obj.get("type"));
