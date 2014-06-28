@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import zebradev.zebraviews.common.Requests;
 import zebradev.zebraviews.server.ConfigManager;
 import zebradev.zebraviews.server.ServerManager;
 
@@ -66,10 +67,8 @@ public class FakeClientManager {
 	
 	public synchronized void login(String username, String password) {
 		
-		TreeMap<String, Object> loginRequest = new TreeMap<String, Object>();
-		loginRequest.put("type", "login");
-		loginRequest.put("username", username);
-		loginRequest.put("password", password);
+		TreeMap<String, Object> loginRequest = Requests.generateRequest
+				("type", "login", "username", username, "password", password);
 		
 		Log.info("Client logging in with username " + username + " and password " + password);
 		
@@ -77,10 +76,9 @@ public class FakeClientManager {
 	}
 	
 	public synchronized void signup(String username, String password) {
-		TreeMap<String, Object> signupRequest = new TreeMap<String, Object>();
-		signupRequest.put("type", "signup");
-		signupRequest.put("username", username);
-		signupRequest.put("password", password);
+		
+		TreeMap<String, Object> signupRequest = Requests.generateRequest
+				("type", "signup", "username", username, "password", password);
 		
 		Log.info("Client signing up in with username " + username + " and password " + password);
 		
