@@ -20,6 +20,7 @@ package zebradev.zebraviews.server;
 import java.util.Hashtable;
 
 import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 
@@ -46,6 +47,10 @@ public class ServerRequestListener extends Listener {
 	@Override
 	public void received(Connection connection, Object object) {
 		Log.info("Server received object from " + connection);
+		
+		if (object instanceof FrameworkMessage.KeepAlive)
+			return;
+		
 		this.connections.get(connection).received(object);
 		
 		if (this.connections.containsKey(connection))
