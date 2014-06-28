@@ -17,6 +17,9 @@
 
 package zebradev.zebraviews.fakeclient;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
@@ -36,6 +39,14 @@ public class ClientRequestListener extends Listener {
 	@Override
 	public void received(Connection connection, Object object) {
 		Log.info("Client received object from " + connection);
+		
+		if (object instanceof TreeMap)
+		{
+			@SuppressWarnings("unchecked")
+			TreeMap<String, Object> request = (TreeMap<String, Object>) object;
+			for(Map.Entry<String, Object> entry : request.entrySet())
+				Log.info("<" + entry.getKey() + ", " + entry.getValue() + ">");
+		}
 	}
 	
 	@Override
