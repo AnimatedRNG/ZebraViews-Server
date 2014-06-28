@@ -7,13 +7,14 @@
 <project basedir="." default="build" name="ZebraViews-Server">
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
-    <property name="target" value="1.6"/>
-    <property name="source" value="1.6"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
     <path id="ZebraViews-Server.classpath">
         <pathelement location="bin"/>
         <pathelement location="lib/kryonet-2.21-all.jar"/>
         <pathelement location="lib/jsoup-1.7.3.jar"/>
         <pathelement location="build"/>
+        <pathelement location="lib/sql2o-1.5.1.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -31,23 +32,23 @@
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
             <classpath refid="ZebraViews-Server.classpath"/>
         </javac>
     </target>
+	<target name="jar">
+	        <mkdir dir="jar" />
+	        <jar destfile="jar/ZebraViews-Server.jar" basedir="bin">
+	            <manifest>
+	                <attribute name="Main-Class" value="zebradev.zebraviews.server.ServerRunner" />
+	            </manifest>
+	        </jar>
+	</target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
     <target name="ServerRunner">
         <java classname="zebradev.zebraviews.server.ServerRunner" failonerror="true" fork="yes">
             <classpath refid="ZebraViews-Server.classpath"/>
         </java>
-    </target>
-    <target name="jar">
-        <mkdir dir="jar" />
-        <jar destfile="jar/ZebraViews-Server.jar" basedir="bin">
-            <manifest>
-                <attribute name="Main-Class" value="zebradev.zebraviews.server.ServerRunner" />
-            </manifest>
-        </jar>
     </target>
 </project>
