@@ -40,6 +40,6 @@ public class ClientRequestListener extends Listener {
 	
 	@Override
 	public void idle(Connection connection) {
-		Log.info("Client idle on " + connection);
+		//Log.info("Client idle on " + connection);
 	}
 }
