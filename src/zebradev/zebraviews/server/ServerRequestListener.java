@@ -59,6 +59,6 @@ public class ServerRequestListener extends Listener {
 	
 	@Override
 	public void idle(Connection connection) {
-		Log.info("Server idle on " + connection);
+		//Log.info("Server idle on " + connection);
 	}
 }
