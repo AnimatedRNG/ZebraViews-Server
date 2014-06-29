@@ -68,7 +68,7 @@ public class FakeClientManager {
 	public synchronized void login(String username, String password) {
 		
 		TreeMap<String, Object> loginRequest = Requests.generateRequest
-				("type", Requests.LOGIN.value, "username", username, "password", password);
+				("type", Requests.LOGIN.value, "username", username, "password", password, "details", "");
 		
 		Log.info("Client logging in with username " + username + " and password " + password);
 		
@@ -78,7 +78,7 @@ public class FakeClientManager {
 	public synchronized void signup(String username, String password) {
 		
 		TreeMap<String, Object> signupRequest = Requests.generateRequest
-				("type", Requests.SIGNUP.value, "username", username, "password", password);
+				("type", Requests.SIGNUP.value, "username", username, "password", password, "details", "");
 		
 		Log.info("Client signing up in with username " + username + " and password " + password);
 		
