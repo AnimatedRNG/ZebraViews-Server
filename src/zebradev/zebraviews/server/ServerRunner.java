@@ -147,7 +147,7 @@ public class ServerRunner extends JPanel implements ActionListener {
 		
 		s = doc.addStyle("warning", regular);
 		StyleConstants.setBold(s, true);
-		StyleConstants.setForeground(s, Color.YELLOW);
+		StyleConstants.setForeground(s, Color.ORANGE);
 		
 		s = doc.addStyle("info", regular);
 		StyleConstants.setForeground(s, Color.BLACK);
