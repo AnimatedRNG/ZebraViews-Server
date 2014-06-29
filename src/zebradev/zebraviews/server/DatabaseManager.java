@@ -28,14 +28,30 @@ import com.esotericsoftware.minlog.Log;
 public class DatabaseManager {
 
 	private TreeMap<String, Object> object;
+	private Sql2o sql2o;
 	public static final String DB_URL = "jdbc:mysql://localhost:3306/mysql";
 	public static final String ROOT = "root";
 	public static final String PASS = "";
 	
 	public static final String LOGIN_QUERY = "SELECT password, details FROM login WHERE username=:NAME";
+	public static final String SIGNUP_QUERY = "INSERT INTO login VALUES (:username, :password, :details)";
+	
+	public static final int USERNAME_MIN_LENGTH = 8;
+	public static final int USERNAME_MAX_LENGTH = 30;
+	
+	public static final int PASSWORD_MIN_LENGTH = 8;
+	public static final int PASSWORD_MAX_LENGTH = 30;
+	
+	public static final int DETAILS_MAX_LENGTH = 20;
 
 	public DatabaseManager(TreeMap<String, Object> obj) {
 		this.object = obj;
+		
+		try {
+			this.sql2o = new Sql2o(DB_URL, ROOT, PASS);
+		} catch (Exception e) {
+			Log.error("Error initializing database", e);
+		}
 	}
 	
 	// Returns true if the user is authorized, otherwise false
@@ -43,10 +59,12 @@ public class DatabaseManager {
 		String username = ((String) object.get("username"));
 		String password = ((String) object.get("password"));
 		
-		Sql2o sql2o = new Sql2o(DB_URL, ROOT, PASS);
+		if (!this.verifyValidity(username, password, ""))
+			return false;
 		
 		List<LoginTask> tasks = null;
-		try(Connection con = sql2o.open()) {
+		try {
+			Connection con = this.sql2o.open();
 			tasks = con.createQuery(LOGIN_QUERY)
 					.addParameter("NAME", username).executeAndFetch(LoginTask.class);
 		} catch (Exception e) {
@@ -72,13 +90,50 @@ public class DatabaseManager {
 	public boolean signup() {
 		String username = ((String) object.get("username"));
 		String password = ((String) object.get("password"));
+		String details = ((String) object.get("details"));
 		
+		if (!this.verifyValidity(username, password, details))
+			return false;
+		
+		List<LoginTask> tasks = null;
+		try {
+			Connection con = this.sql2o.open();
+			tasks = con.createQuery(LOGIN_QUERY)
+					.addParameter("NAME", username).executeAndFetch(LoginTask.class);
+			if (tasks.size() > 0)
+			{
+				Log.warn("Username " + username + "already exists in database");
+				return false;
+			}
+			
+			con.createQuery(SIGNUP_QUERY)
+			.addParameter("username", username)
+			.addParameter("password", password)
+			.addParameter("details", details)
+			.executeUpdate();
+			
+			return true;
+			
+		} catch (Exception e) {
+			Log.error("Database error", e);
+			return false;
+		}
+	}
+	
+	private boolean verifyValidity(String username, String password, String details) {
+		if (username.length() < USERNAME_MAX_LENGTH && username.length() > USERNAME_MIN_LENGTH)
+		{
+			if (password.length() < PASSWORD_MAX_LENGTH && password.length() > PASSWORD_MIN_LENGTH)
+			{
+				if (details.length() < DETAILS_MAX_LENGTH)
+					return true;
+			}
+		}
 		return false;
-		// Return result from database
 	}
 	
 	private class LoginTask {
-		public String password;
-		public String details;
+		private String password;
+		private String details;
 	}
 }
