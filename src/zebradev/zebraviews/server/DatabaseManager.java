@@ -17,11 +17,22 @@
 
 package zebradev.zebraviews.server;
 
+import java.util.List;
 import java.util.TreeMap;
+
+import org.sql2o.Connection;
+import org.sql2o.Sql2o;
+
+import com.esotericsoftware.minlog.Log;
 
 public class DatabaseManager {
 
 	private TreeMap<String, Object> object;
+	public static final String DB_URL = "jdbc:mysql://localhost:3306/mysql";
+	public static final String ROOT = "root";
+	public static final String PASS = "";
+	
+	public static final String LOGIN_QUERY = "SELECT password, details FROM login WHERE username=:NAME";
 
 	public DatabaseManager(TreeMap<String, Object> obj) {
 		this.object = obj;
@@ -32,16 +43,42 @@ public class DatabaseManager {
 		String username = ((String) object.get("username"));
 		String password = ((String) object.get("password"));
 		
-		return false;
-		// Return result from database
+		Sql2o sql2o = new Sql2o(DB_URL, ROOT, PASS);
+		
+		List<LoginTask> tasks = null;
+		try(Connection con = sql2o.open()) {
+			tasks = con.createQuery(LOGIN_QUERY)
+					.addParameter("NAME", username).executeAndFetch(LoginTask.class);
+		} catch (Exception e) {
+			Log.error("Database error", e);
+			return false;
+		}
+		
+		if (tasks.size() == 0)
+			return false;
+		else if (tasks.size() == 1)
+		{
+			if (password.equals(tasks.get(0).password))
+				return true;
+			else
+				return false;
+		} else {
+			Log.error("Multiple accounts with the same username!");
+			return false;
+		}
 	}
 
-	// Returns true if the user is authorized, otherwise false
+	// Returns true if the user is signed up, otherwise false
 	public boolean signup() {
 		String username = ((String) object.get("username"));
 		String password = ((String) object.get("password"));
 		
 		return false;
 		// Return result from database
+	}
+	
+	private class LoginTask {
+		public String password;
+		public String details;
 	}
 }
