@@ -36,7 +36,7 @@ public class DatabaseManager {
 	public static final String LOGIN_QUERY = "SELECT password, details FROM login WHERE username=:NAME";
 	public static final String SIGNUP_QUERY = "INSERT INTO login VALUES (:username, :password, :details)";
 	
-	public static final int USERNAME_MIN_LENGTH = 8;
+	public static final int USERNAME_MIN_LENGTH = 4;
 	public static final int USERNAME_MAX_LENGTH = 30;
 	
 	public static final int PASSWORD_MIN_LENGTH = 8;
@@ -121,11 +121,11 @@ public class DatabaseManager {
 	}
 	
 	private boolean verifyValidity(String username, String password, String details) {
-		if (username.length() < USERNAME_MAX_LENGTH && username.length() > USERNAME_MIN_LENGTH)
+		if (username.length() <= USERNAME_MAX_LENGTH && username.length() >= USERNAME_MIN_LENGTH)
 		{
-			if (password.length() < PASSWORD_MAX_LENGTH && password.length() > PASSWORD_MIN_LENGTH)
+			if (password.length() <= PASSWORD_MAX_LENGTH && password.length() >= PASSWORD_MIN_LENGTH)
 			{
-				if (details.length() < DETAILS_MAX_LENGTH)
+				if (details.length() <= DETAILS_MAX_LENGTH)
 					return true;
 			}
 		}
