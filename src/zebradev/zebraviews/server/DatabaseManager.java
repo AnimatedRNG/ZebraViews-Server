@@ -56,7 +56,7 @@ public class DatabaseManager {
 	
 	// Returns true if the user is authorized, otherwise false
 	public boolean login() {
-		String username = ((String) object.get("username"));
+		String username = ((String) object.get("username")).toLowerCase();
 		String password = ((String) object.get("password"));
 		
 		if (!this.verifyValidity(username, password, ""))
@@ -88,7 +88,7 @@ public class DatabaseManager {
 
 	// Returns true if the user is signed up, otherwise false
 	public boolean signup() {
-		String username = ((String) object.get("username"));
+		String username = ((String) object.get("username")).toLowerCase();
 		String password = ((String) object.get("password"));
 		String details = ((String) object.get("details"));
 		
