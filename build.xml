@@ -12,6 +12,7 @@
         <pathelement location="lib/sql2o-1.5.1.jar"/>
         <pathelement location="lib/mysql-connector-java-5.1.31-bin.jar"/>
         <pathelement location="lib/commons-net-3.1.jar"/>
+        <pathelement location="lib/commons-codec-1.9.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
