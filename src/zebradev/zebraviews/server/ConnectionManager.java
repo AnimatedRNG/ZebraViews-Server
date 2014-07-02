@@ -29,6 +29,8 @@ public class ConnectionManager {
 	private boolean loggedIn;
 	private Connection connection;
 	public static String greeting;
+	private ProductManager productManager;
+	private Thread productThread;
 	
 	public ConnectionManager(Connection connection) {
 		this.loggedIn = false;
@@ -52,7 +54,8 @@ public class ConnectionManager {
 		
 		if (type == null)
 		{
-			Log.error("Request type not specified");
+			Log.error(this.connection.toString(),
+					"Request type not specified");
 			return;
 		}
 		
@@ -60,9 +63,11 @@ public class ConnectionManager {
 		{
 			this.loggedIn = new DatabaseManager(obj).login();
 			if (this.loggedIn)
-				Log.info("Server successfully authenticated user " + obj.get("username"));
+				Log.info(this.connection.toString(),
+						"Server successfully authenticated user " + obj.get("username"));
 			else
-				Log.info("Server did not authenticate user " + obj.get("username"));
+				Log.info(this.connection.toString(),
+						"Server did not authenticate user " + obj.get("username"));
 			String status = (this.loggedIn) ? Requests.STATUS_SUCCESS.value : Requests.STATUS_FAILURE.value;
 			this.connection.sendTCP(Requests.generateRequest("type", Requests.LOGIN_RESPONSE.value,
 					"status", status, "message", ConnectionManager.greeting));
@@ -72,14 +77,45 @@ public class ConnectionManager {
 			if (loggedIn) loggedIn = false;
 			boolean signedUp = new DatabaseManager(obj).signup();
 			if (signedUp)
-				Log.info("Server successfully signed up user " + obj.get("username"));
+				Log.info(this.connection.toString(),
+						"Server successfully signed up user " + obj.get("username"));
 			else
-				Log.info("Server did not sign up user " + obj.get("username"));
+				Log.info(this.connection.toString(),
+						"Server did not sign up user " + obj.get("username"));
 			String status = (signedUp) ? Requests.STATUS_SUCCESS.value : Requests.STATUS_FAILURE.value;
 			this.connection.sendTCP(Requests.generateRequest("type", Requests.SIGNUP_RESPONSE.value,
 					"status", status));
 		}
+		else if (type.equals(Requests.PRODUCT_SEARCH.value))
+		{
+			if (!loggedIn)
+			{
+				Log.warn(this.connection.toString(),
+						"Client not logged in. Rejecting product search request.");
+				return;
+			}
+			
+			if (!obj.containsKey("product_type") || !obj.containsKey("product_code")
+					|| !obj.containsKey("allergen_list"))
+			{
+				Log.warn(this.connection.toString(),
+						"Invalid product search, missing arguments!");
+				return;
+			}
+			
+			this.productManager = new ProductManager(obj);
+			this.productThread = new Thread(this.productManager);
+			this.productThread.start();
+			
+			Log.info(this.connection.toString(),
+					"Client launched product search for product " + 
+					obj.get("product_code") + " reported type " + obj.get("product_type"));
+			
+			TreeMap<String, Object> immediateResponse = Requests.generateRequest("type",
+					Requests.SEARCH_RESPONSE_IMMEDIATE.value);
+			this.connection.sendTCP(immediateResponse);
+		}
 		else
-			Log.error("Invalid request " + obj.get("type"));
+			Log.error(this.connection.toString(), "Invalid request " + obj.get("type"));
 	}
 }

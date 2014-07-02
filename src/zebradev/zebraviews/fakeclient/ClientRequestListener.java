@@ -20,6 +20,8 @@ package zebradev.zebraviews.fakeclient;
 import java.util.Map;
 import java.util.TreeMap;
 
+import zebradev.zebraviews.processor.Product;
+
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
@@ -44,13 +46,19 @@ public class ClientRequestListener extends Listener {
 		{
 			@SuppressWarnings("unchecked")
 			TreeMap<String, Object> request = (TreeMap<String, Object>) object;
-			for(Map.Entry<String, Object> entry : request.entrySet())
-				Log.info("<" + entry.getKey() + ", " + entry.getValue() + ">");
+			this.logTreeMap(request);
 		}
+		if (object instanceof Product)
+			this.logTreeMap(((Product) object).concatenate());
 	}
 	
 	@Override
 	public void idle(Connection connection) {
 		//Log.info("Client idle on " + connection);
+	}
+	
+	private void logTreeMap(TreeMap<String, Object> treeMap) {
+		for(Map.Entry<String, Object> entry : treeMap.entrySet())
+			Log.info("<" + entry.getKey() + ", " + entry.getValue() + ">");
 	}
 }

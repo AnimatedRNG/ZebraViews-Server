@@ -23,6 +23,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import zebradev.zebraviews.common.ConfigManager;
+
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Listener.ThreadedListener;
 import com.esotericsoftware.kryonet.Server;
@@ -49,6 +51,7 @@ public class ServerManager {
 	    // Remove this once we add our serializer
 	    Kryo kryo = this.zebraViewsServer.getKryo();
 	    kryo.register(java.util.TreeMap.class);
+	    kryo.register(zebradev.zebraviews.processor.Product.class);
 	    
 	    Log.info("Server started on port " + port);
 	}

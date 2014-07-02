@@ -1,3 +1,20 @@
+//	This file is part of ZebraViews.
+//
+//	Copyright 2014 AnimatedJuzz <kazasrinivas3@gmail.com>
+//
+//	ZebraViews is free software: you can redistribute it and/or modify
+//	under the terms of the GNU General Public License as published by
+//	the Free Software Foundation, either version 3 of the License, or
+//	(at your option) any later version.
+//
+//	ZebraViews is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
+//	You should have received a copy of the GNU General Public License
+//	along with ZebraViews.  If not, see <http://www.gnu.org/licenses/>.
+
 package zebradev.zebraviews.processor;
 
 import java.util.HashMap;
@@ -9,22 +26,32 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import zebradev.zebraviews.common.ConfigManager;
 import zebradev.zebraviews.common.SignedRequestsHelper;
 
+import com.esotericsoftware.minlog.Log;
 
-public class AmazonProcessor
+
+public class AmazonProcessor extends Processor
 {
 	private String AWS_ACCESS_KEY_ID;
 	private String AWS_SECRET_KEY;
 	private String ENDPOINT;
 	private String ITEM_ID;
 
-	public AmazonProcessor(String accessKey, String secretKey, String endPoint, String itemID)
-	{
-		AWS_ACCESS_KEY_ID = accessKey;
-		AWS_SECRET_KEY = secretKey;
-		ENDPOINT = endPoint;
-		ITEM_ID = itemID;		
+	public AmazonProcessor(Product product) {
+		this.setProduct(product);
+		ConfigManager config = null;
+		try {
+			config = new ConfigManager("config/amazon_config.xml", "Amazon");
+		} catch (Exception e) {
+			Log.error("Error reading config file!", e);
+			return;
+		}
+		this.AWS_ACCESS_KEY_ID = config.get("aws_access_key_id");
+		this.AWS_SECRET_KEY = config.get("aws_secret_key");
+		this.ENDPOINT = config.get("endpoint");
+		this.ITEM_ID = (String) this.getProduct().getTop("product_code");
 	}
 
 	public String getAccessKey()
@@ -97,5 +124,11 @@ public class AmazonProcessor
     {
     	return "http://www.amazon.com/product-reviews/"+asin+"/";
     }
+
+	@Override
+	protected void onExecute(Product product) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

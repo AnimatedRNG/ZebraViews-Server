@@ -1,3 +1,20 @@
+//	This file is part of ZebraViews.
+//
+//	Copyright 2014 AnimatedJuzz <kazasrinivas3@gmail.com>
+//
+//	ZebraViews is free software: you can redistribute it and/or modify
+//	under the terms of the GNU General Public License as published by
+//	the Free Software Foundation, either version 3 of the License, or
+//	(at your option) any later version.
+//
+//	ZebraViews is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
+//	You should have received a copy of the GNU General Public License
+//	along with ZebraViews.  If not, see <http://www.gnu.org/licenses/>.
+
 package zebradev.zebraviews.processor;
 
 import java.util.TreeMap;
@@ -11,12 +28,20 @@ public class Product extends ConcurrentLinkedQueue<TreeMap<String, Object>> {
 		this.add(new TreeMap<String, Object>());
 	}
 	
+	public synchronized Object getTop(String attributeName) {
+		return this.peek().get(attributeName);
+	}
+	
+	public synchronized void putAllTop(TreeMap<String, Object> addMap) {
+		this.peek().putAll(addMap);
+	}
+	
 	public synchronized void putTop(String attributeName, Object object) {
 		this.peek().put(attributeName, object);
 	}
 	
-	public synchronized Object getTop(String attributeName) {
-		return this.peek().get(attributeName);
+	public synchronized void removeFromTop(String attributeName) {
+		this.peek().remove(attributeName);
 	}
 	
 	// Intensive process -- complete in separate thread

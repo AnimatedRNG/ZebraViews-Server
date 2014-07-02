@@ -24,8 +24,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import zebradev.zebraviews.common.ConfigManager;
 import zebradev.zebraviews.common.Requests;
-import zebradev.zebraviews.server.ConfigManager;
 import zebradev.zebraviews.server.ServerManager;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -63,6 +63,7 @@ public class FakeClientManager {
 		// Remove this once we add our serializer
 	    Kryo kryo = this.zebraViewsClient.getKryo();
 	    kryo.register(java.util.TreeMap.class);
+	    kryo.register(zebradev.zebraviews.processor.Product.class);
 	}
 	
 	public synchronized void login(String username, String password) {
@@ -83,6 +84,16 @@ public class FakeClientManager {
 		Log.info("Client signing up in with username " + username + " and password " + password);
 		
 		this.zebraViewsClient.sendTCP(signupRequest);
+	}
+	
+	public synchronized void sendProductSearchRequest(String productType, String productCode) {
+		TreeMap<String, Object> searchRequest = Requests.generateRequest
+				("type", Requests.PRODUCT_SEARCH.value, "product_type", productType,
+						"product_code", productCode, "allergen_list", "");
+		
+		Log.info("Client searching for product " + productCode + " of type " + productType);
+		
+		this.zebraViewsClient.sendTCP(searchRequest);
 	}
 	
 	public synchronized void stop() {

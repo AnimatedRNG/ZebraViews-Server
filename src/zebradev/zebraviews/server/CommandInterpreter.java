@@ -125,6 +125,15 @@ public class CommandInterpreter {
 					
 					this.clientManager.signup(allArgs.get(1), allArgs.get(2));
 				}
+				else if (command.equals(ClientCommands.PRODUCT_SEARCH.toString())) {
+					if (allArgs.size() != 3)
+					{
+						Log.error("Incorrect number of arguments");
+						return;
+					}
+					
+					this.clientManager.sendProductSearchRequest(allArgs.get(1), allArgs.get(2));
+				}
 			}
 		}
 	}

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='us-ascii'?>
+
+<Amazon 
+	aws_access_key_id=""
+	aws_secret_key=""
+	endpoint="ecs.amazonaws.com"
+	>
+</Amazon>

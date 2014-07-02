@@ -17,13 +17,11 @@
 
 package zebradev.zebraviews.processor;
 
-import java.util.TreeMap;
-
 import com.esotericsoftware.minlog.Log;
 
 public abstract class Processor implements Runnable {
 	
-	private TreeMap<String, Object> product;
+	private Product product;
 	
 	@Override
 	public void run() {
@@ -33,13 +31,13 @@ public abstract class Processor implements Runnable {
 			Log.error("Product object not supplied!");
 	}
 	
-	public TreeMap<String, Object> getProduct() {
+	public Product getProduct() {
 		return this.product;
 	}
 	
-	public void setProduct(TreeMap<String, Object> product) {
+	public void setProduct(Product product) {
 		this.product = product;
 	}
 	
-	protected abstract void onExecute(TreeMap<String, Object> product);
+	protected abstract void onExecute(Product product);
 }

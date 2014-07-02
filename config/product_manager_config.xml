@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='us-ascii'?>
+
+<product_manager 
+	max_threads="4"
+	basic_info_timeout="5000"
+	>
+</product_manager>
