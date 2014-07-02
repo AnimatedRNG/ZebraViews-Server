@@ -64,6 +64,7 @@ public class FakeClientManager {
 	    Kryo kryo = this.zebraViewsClient.getKryo();
 	    kryo.register(java.util.TreeMap.class);
 	    kryo.register(zebradev.zebraviews.processor.Product.class);
+	    kryo.register(java.util.ArrayList.class);
 	}
 	
 	public synchronized void login(String username, String password) {

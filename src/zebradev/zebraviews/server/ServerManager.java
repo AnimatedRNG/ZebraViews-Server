@@ -52,6 +52,7 @@ public class ServerManager {
 	    Kryo kryo = this.zebraViewsServer.getKryo();
 	    kryo.register(java.util.TreeMap.class);
 	    kryo.register(zebradev.zebraviews.processor.Product.class);
+	    kryo.register(java.util.ArrayList.class);
 	    
 	    Log.info("Server started on port " + port);
 	}
