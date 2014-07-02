@@ -22,13 +22,24 @@ import com.esotericsoftware.minlog.Log;
 public abstract class Processor implements Runnable {
 	
 	private Product product;
+	public boolean failed;
 	
 	@Override
 	public void run() {
 		if (this.product != null)
-			this.onExecute(this.product);
+		{
+			try {
+				this.onExecute(this.product);
+			} catch (ProcessingException e) {
+				Log.error("Processor " + e.getProcessor() + "failed", e);
+				this.failed = true;
+			}
+		}
 		else
+		{
 			Log.error("Product object not supplied!");
+			this.failed = true;
+		}
 	}
 	
 	public Product getProduct() {
@@ -39,5 +50,5 @@ public abstract class Processor implements Runnable {
 		this.product = product;
 	}
 	
-	protected abstract void onExecute(Product product);
+	protected abstract void onExecute(Product product) throws ProcessingException;
 }

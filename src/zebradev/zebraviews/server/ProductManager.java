@@ -63,6 +63,8 @@ public class ProductManager implements Runnable {
 		
 		// Add more basic info executors later
 		Processor amazon = new AmazonProcessor(this.product);
+		
+		long startTime = System.nanoTime();
 		executor.execute(amazon);
 		
 		executor.shutdown();
@@ -78,6 +80,17 @@ public class ProductManager implements Runnable {
 		if (!finished)
 		{
 			this.fail("Basic info mining taking too long", null);
+			return;
+		}
+		else
+		{
+			Log.info("Basic info mining took " + 
+					(System.nanoTime()-startTime) / (Math.pow(10, 9)) + " seconds");
+		}
+		
+		if (amazon.failed)
+		{
+			this.fail("AmazonProcessor failed", null);
 			return;
 		}
 		

@@ -126,7 +126,7 @@ public class AmazonProcessor extends Processor
     }
 
 	@Override
-	protected void onExecute(Product product) 
+	protected void onExecute(Product product) throws ProcessingException
 	{
 		List<String> prices = new ArrayList<String>();
 		String title = "";
@@ -161,7 +161,7 @@ public class AmazonProcessor extends Processor
 		}
 		catch (Exception e)
 		{
-			Log.warn("AmazonProcessor", "Failed to fetch asin");
+			throw new ProcessingException("AmazonProcessor", "Failed to fetch ASIN", e);
 		}
 		try 
 		{
