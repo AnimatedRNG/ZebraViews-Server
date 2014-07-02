@@ -17,6 +17,10 @@
 
 package zebradev.zebraviews.server;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +81,36 @@ public class CommandInterpreter {
 		}
 		else
 		{
+			if (command.equals(ClientCommands.RUN_MACRO.toString()))
+			{
+				try {
+					@SuppressWarnings("resource")
+					BufferedReader macroReader = new BufferedReader(
+							new FileReader("config/macro.config"));
+					
+					String line;
+					while ((line = macroReader.readLine()) != null && (line.length() > 7))
+					{
+						if (line.substring(8, this.getNextWordIndex(7, line))
+								.equals(ClientCommands.RUN_MACRO.toString()))
+						{
+							Log.error("Macro is recursive!");
+							return;
+						}
+						try {
+							Log.info("macro", line);
+							this.interpret(line);
+						} catch (Exception e) {
+							Log.error("Exception running macro", e);
+						}
+					}
+					
+					macroReader.close();
+				} catch (IOException a) {
+					Log.error("IO error", a);
+					return;
+				}
+			}
 			if (command.equals(ClientCommands.CONNECT.toString()))
 			{
 				try {

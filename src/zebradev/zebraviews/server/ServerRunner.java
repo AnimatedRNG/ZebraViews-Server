@@ -174,9 +174,7 @@ public class ServerRunner extends JPanel implements ActionListener {
 		else if (text.length() >= 7 && text.substring(0, 7).equals("/client"))
 			style = "client";
 		else
-		{
 			style = "comment";
-		}
 		Log.info(style, text);
 		
 		if (!style.equals("comment"))

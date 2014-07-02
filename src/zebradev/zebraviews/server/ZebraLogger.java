@@ -53,7 +53,7 @@ public class ZebraLogger extends Logger {
 		{
 			if (category.equals("server"))
 				style = ZebraLogger.DOC.getStyle("server");
-			else if (category.equals("client"))
+			else if (category.equals("client") || category.equals("macro"))
 				style = ZebraLogger.DOC.getStyle("client");
 			else if (category.equals("comment"))
 				style = ZebraLogger.DOC.getStyle("comment");

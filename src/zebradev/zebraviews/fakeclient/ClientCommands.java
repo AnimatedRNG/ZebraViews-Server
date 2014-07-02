@@ -19,8 +19,8 @@ package zebradev.zebraviews.fakeclient;
 
 public enum ClientCommands {
 
-	CONNECT ("connect"), DISCONNECT ("disconnect"), SEND ("send"), IDLE ("idle"),
-	LOGIN ("login"), SIGNUP ("signup"), PRODUCT_SEARCH ("product_search");
+	RUN_MACRO ("macro"), CONNECT ("connect"), DISCONNECT ("disconnect"),
+	SEND ("send"), IDLE ("idle"), LOGIN ("login"), SIGNUP ("signup"), PRODUCT_SEARCH ("product_search");
 	
 	public String value;
 	
