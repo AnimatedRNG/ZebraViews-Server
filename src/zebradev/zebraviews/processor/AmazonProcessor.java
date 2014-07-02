@@ -97,7 +97,7 @@ public class AmazonProcessor extends Processor
         params.put("Service", "AWSECommerceService");
         params.put("Version", "2013-08-01");
         params.put("Operation", "ItemLookup");
-        params.put("IdType", "UPC");
+        params.put("IdType", ((String) this.getProduct().getTop("product_type")).toUpperCase());
         params.put("ItemId", ITEM_ID);
         params.put("SearchIndex", "All");
         params.put("ResponseGroup", "Large");
@@ -205,7 +205,6 @@ public class AmazonProcessor extends Processor
 		product.putTop("asin", asin);
 		        
 		reviewsUrl = this.constructProductReviewUrl(asin);
-		System.out.println(reviewsUrl);
 		
 		try 
 		{
