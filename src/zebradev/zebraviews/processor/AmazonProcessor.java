@@ -17,12 +17,17 @@
 
 package zebradev.zebraviews.processor;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jsoup.Jsoup;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -92,7 +97,9 @@ public class AmazonProcessor extends Processor
         params.put("Service", "AWSECommerceService");
         params.put("Version", "2013-08-01");
         params.put("Operation", "ItemLookup");
+        params.put("IdType", "UPC");
         params.put("ItemId", ITEM_ID);
+        params.put("SearchIndex", "All");
         params.put("ResponseGroup", "Large");
         params.put("AssociateTag", "zebra02a-20");
 
@@ -100,22 +107,15 @@ public class AmazonProcessor extends Processor
 		return requestURL;
 	}
 	
-	public String fetchItem(String requestUrl, String itemTag)
+	public String fetchItem(String requestUrl, String itemTag) throws Exception
 	{
         String item = null;
-        try
-        {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(requestUrl);
-            Node itemNode = doc.getElementsByTagName(itemTag).item(0);
-            item = itemNode.getTextContent();
-        }
         
-        catch (Exception e)
-        {
-        	throw new RuntimeException(e);
-        }
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(requestUrl);
+        Node itemNode = doc.getElementsByTagName(itemTag).item(0);
+        item = itemNode.getTextContent();
         
         return item;
     }
@@ -126,9 +126,101 @@ public class AmazonProcessor extends Processor
     }
 
 	@Override
-	protected void onExecute(Product product) {
-		// TODO Auto-generated method stub
+	protected void onExecute(Product product) 
+	{
+		List<String> prices = new ArrayList<String>();
+		String title = "";
+		String description = "";
+		String asin = "";
+		String reviewsUrl = "";
+		String requestUrl = this.constructRequestUrl();
+		Double averageRating = 0.0;
+		String price = "";
 		
-	}
+		try
+		{
+		title = fetchItem(requestUrl, "Title");
+		} 
+		catch (Exception e)
+		{
+			Log.warn("AmazonProcessor", "Failed to fetch title");
+		}
+		
+		try
+		{
+		description = fetchItem(requestUrl, "Content");
+		}
+		catch (Exception e)
+		{
+			Log.warn("AmazonProcessor", "Failed to fetch description");
+		}
+		
+		try
+		{
+		asin = fetchItem(requestUrl, "ASIN");
+		}
+		catch (Exception e)
+		{
+			Log.warn("AmazonProcessor", "Failed to fetch asin");
+		}
+		try 
+		{
+			price = fetchItem(requestUrl, "SalePrice");
+			if (price != null)    
+			{
+				price = price.substring(price.indexOf('$') + 1);
+				prices.add(price);
+			}
+		
+			price = fetchItem(requestUrl, "LowestNewPrice");
+			if (price != null)    
+			{
+				price = price.substring(price.indexOf('$') + 1);
+				prices.add(price);
+			}
+			
+			price = fetchItem(requestUrl, "LowestUsedPrice");
+			if (price != null)    
+			{
+				price = price.substring(price.indexOf('$') + 1);
+				prices.add(price);
+			}
+		
+			price = fetchItem(requestUrl, "ListPrice");
+			if (price != null)    
+			{
+				price = price.substring(price.indexOf('$') + 1);
+				prices.add(price);
+			}
+		}
+		catch (Exception e) 
+		{
+		}
+				
+		if (prices != null)    
+			{
+			product.putTop("price", prices);
+			}
+		product.putTop("product_name", title);
+		product.putTop("asin", asin);
+		        
+		reviewsUrl = this.constructProductReviewUrl(asin);
+		System.out.println(reviewsUrl);
+		
+		try 
+		{
+			org.jsoup.nodes.Document doc = Jsoup.connect(reviewsUrl).get();
+				averageRating = Double.parseDouble((doc.select("span.asinReviewsSummary span[class^=sWSprite s_star] span").first().text()).substring(0,2));
+		    
+		} 
+		catch (Exception e) {
+			Log.warn("Jsoup preliminary scraping failed", e);
+		}
 
+		TreeMap<String, Object> amazonOtherInfo = new TreeMap<String, Object>();
+		amazonOtherInfo.put("name", "AmazonProcessor_initial");
+		amazonOtherInfo.put("description", description);
+		if (averageRating != 0.0)
+		   product.putTop("average rating", averageRating);
+	}
 }
