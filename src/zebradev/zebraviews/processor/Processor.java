@@ -31,7 +31,7 @@ public abstract class Processor implements Runnable {
 			try {
 				this.onExecute(this.product);
 			} catch (ProcessingException e) {
-				Log.error("Processor " + e.getProcessor() + "failed", e);
+				Log.error("Processor " + e.getProcessor() + " failed", e);
 				this.failed = true;
 			}
 		}
