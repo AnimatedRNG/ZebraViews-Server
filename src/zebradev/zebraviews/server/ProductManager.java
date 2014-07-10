@@ -41,6 +41,7 @@ public class ProductManager implements Runnable {
 	public ProductManager(TreeMap<String, Object> request) {
 		this.product = new Product();
 		this.product.putAllTop(request);
+		this.product.putTop("name", "top");
 		this.product.putTop("stage", "basic-info");
 		
 		ConfigManager productManagerConfig;
@@ -58,64 +59,7 @@ public class ProductManager implements Runnable {
 	
 	@Override
 	public void run() {
-		ExecutorService executor = null;
-		executor = Executors.newFixedThreadPool(ProductManager.MAX_THREADS);
-		
-		// Add more basic info executors later
-		Processor amazon = new AmazonProcessor(this.product);
-		
-		long startTime = System.nanoTime();
-		executor.execute(amazon);
-		
-		executor.shutdown();
-		
-		boolean finished;
-		try {
-			finished = executor.awaitTermination(BASIC_INFO_TIMEOUT, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-			this.fail("Basic info mining interrupted ", e);
-			return;
-		}
-		
-		if (!finished)
-		{
-			this.fail("Basic info mining taking too long", null);
-			return;
-		}
-		else
-		{
-			Log.info("Basic info mining took " + 
-					(System.nanoTime()-startTime) / (Math.pow(10, 9)) + " seconds");
-		}
-		
-		if (amazon.failed)
-		{
-			this.fail("AmazonProcessor failed", null);
-			return;
-		}
-		
-		this.product.putTop("type", Requests.SEARCH_RESPONSE_INITIAL.value);
-		this.product.putTop("status", "SUCCESS");
-		this.product.putTop("fail_reason", "");
-		
-		Connection originConnection = (Connection) this.product.getTop("originConnection");
-		this.product.removeFromTop("originConnection");
-		
-		originConnection.sendTCP(this.product);
-		
-		this.product.putTop("originConnection", originConnection);
-		Log.info(originConnection.toString(), "Basic info sent successfully");
-	}
-	
-	public void fail(String reason, Exception e) {
-		Log.error(reason, e);
-		
-		this.product.putTop("type", Requests.SEARCH_RESPONSE_INITIAL.value);
-		this.product.putTop("status", "FAILURE");
-		this.product.putTop("fail_reason", reason);
-		
-		Connection originConnection = (Connection) this.product.getTop("originConnection");
-		this.product.removeFromTop("originConnection");
-		originConnection.sendTCP(this.product);
+		BasicInfoManager basicInfo = new BasicInfoManager(this.product);
+		basicInfo.startProcessing();
 	}
 }

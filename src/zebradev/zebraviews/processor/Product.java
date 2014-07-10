@@ -17,6 +17,7 @@
 
 package zebradev.zebraviews.processor;
 
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -49,7 +50,8 @@ public class Product extends ConcurrentLinkedQueue<TreeMap<String, Object>> {
 	public TreeMap<String, Object> concatenate() {
 		TreeMap<String, Object> currentMap = new TreeMap<String, Object>();
 		for (Object a : this.toArray())
-			currentMap.putAll((TreeMap<String, Object>) a);
+			for (Map.Entry<String, Object> entry : ((TreeMap<String, Object>) a).entrySet())
+				currentMap.put(((TreeMap<String, Object>) a).get("name") + "_" + entry.getKey(), entry.getValue());
 		return currentMap;
 	}
 }
