@@ -157,7 +157,10 @@ public class AmazonProcessor extends Processor
 		
 		try
 		{
-		asin = fetchItem(requestUrl, "ASIN");
+		if (!(((String) this.getProduct().getTop("product_type")).toUpperCase()).equals("ASIN"))
+			asin = fetchItem(requestUrl, "ASIN");
+		else
+			asin = ((String) this.getProduct().getTop("product_type")).toUpperCase();
 		}
 		catch (Exception e)
 		{
