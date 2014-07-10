@@ -103,7 +103,8 @@ public class AmazonProcessor extends Processor
         params.put("ResponseGroup", "Large");
         params.put("AssociateTag", "zebra02a-20");
 
-        String requestURL = helper.sign(params);		
+        String requestURL = helper.sign(params);
+        System.out.println(requestURL);
 		return requestURL;
 	}
 	
@@ -221,5 +222,6 @@ public class AmazonProcessor extends Processor
 		amazonOtherInfo.put("description", description);
 		if (averageRating != 0.0)
 		   product.putTop("average rating", averageRating);
+		product.add(amazonOtherInfo);
 	}
 }
