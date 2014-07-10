@@ -62,7 +62,10 @@ public class BasicInfoManager {
 		}
 		
 		if (!succeeded)
+		{
 			this.fail("Basic info mining failed to find basic info", new RuntimeException());
+			return;
+		}
 		
 		this.product.putTop("type", Requests.SEARCH_RESPONSE_INITIAL.value);
 		this.product.putTop("status", "SUCCESS");
