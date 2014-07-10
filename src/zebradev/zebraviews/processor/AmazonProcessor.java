@@ -104,7 +104,6 @@ public class AmazonProcessor extends Processor
         params.put("AssociateTag", "zebra02a-20");
 
         String requestURL = helper.sign(params);
-        System.out.println(requestURL);
 		return requestURL;
 	}
 	
