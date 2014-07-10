@@ -99,12 +99,13 @@ public class AmazonProcessor extends Processor
         params.put("Operation", "ItemLookup");
         params.put("IdType", ((String) this.getProduct().getTop("product_type")).toUpperCase());
         params.put("ItemId", ITEM_ID);
-        params.put("SearchIndex", "All");
+        if (!(((String) this.getProduct().getTop("product_type")).toUpperCase().equals("ASIN")))
+        	params.put("SearchIndex", "All");
         params.put("ResponseGroup", "Large");
         params.put("AssociateTag", "zebra02a-20");
 
         String requestURL = helper.sign(params);
-		return requestURL;
+        return requestURL;
 	}
 	
 	public String fetchItem(String requestUrl, String itemTag) throws Exception
@@ -160,7 +161,7 @@ public class AmazonProcessor extends Processor
 		if (!(((String) this.getProduct().getTop("product_type")).toUpperCase()).equals("ASIN"))
 			asin = fetchItem(requestUrl, "ASIN");
 		else
-			asin = ((String) this.getProduct().getTop("product_type")).toUpperCase();
+			asin = ITEM_ID;
 		}
 		catch (Exception e)
 		{
