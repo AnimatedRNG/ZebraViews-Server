@@ -17,8 +17,11 @@
 
 package zebradev.zebraviews.server;
 
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,7 +46,7 @@ public class DatabaseManager {
 	
 	public static final String LOGIN_QUERY = "SELECT password, details FROM login WHERE username=:NAME";
 	public static final String SIGNUP_QUERY = "INSERT INTO login VALUES (:username, :password, :details)";
-	public static final String CACHE_QUERY = "INSERT INTO CachedSearches (ProductCode, Details, Product) VALUES (?,?,?)";
+	public static final String CACHE_STORE_QUERY = "INSERT INTO CachedSearches (ProductCode, Details, Product) VALUES (?,?,?)";
 	public static final String CACHE_SEARCH_QUERY = "Select Product FROM CachedSearches WHERE ProductCode = ?";
 	 
 	public static final int USERNAME_MIN_LENGTH = 4;
@@ -81,7 +84,7 @@ public class DatabaseManager {
 		try {
 			conn = DriverManager.getConnection(DB_URL, ROOT, PASS);
 		
-			stmt = conn.prepareStatement(CACHE_QUERY);
+			stmt = conn.prepareStatement(CACHE_STORE_QUERY);
 			stmt.setString(1, productCode);
 			stmt.setString(2, details);
 			stmt.setBytes(3, binaryProduct);
@@ -190,6 +193,22 @@ public class DatabaseManager {
 		return false;
 	}
 	
+	private static class Serializer {
+		
+		public static byte[] serialize(Object obj) throws IOException {
+		    ByteArrayOutputStream out = new ByteArrayOutputStream();
+		    ObjectOutputStream os = new ObjectOutputStream(out);
+		    os.writeObject(obj);
+		    return out.toByteArray();
+		}
+		
+		public static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
+		    ByteArrayInputStream in = new ByteArrayInputStream(data);
+		    ObjectInputStream is = new ObjectInputStream(in);
+		    return is.readObject();
+		}
+	}
+
 	private class LoginTask {
 		private String password;
 		private String details;
