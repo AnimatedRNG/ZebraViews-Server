@@ -17,11 +17,19 @@
 
 package zebradev.zebraviews.server;
 
+
+import java.io.IOException;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.TreeMap;
 
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
+
+import zebradev.zebraviews.processor.Product;
 
 import com.esotericsoftware.minlog.Log;
 
@@ -35,7 +43,9 @@ public class DatabaseManager {
 	
 	public static final String LOGIN_QUERY = "SELECT password, details FROM login WHERE username=:NAME";
 	public static final String SIGNUP_QUERY = "INSERT INTO login VALUES (:username, :password, :details)";
-	
+	public static final String CACHE_QUERY = "INSERT INTO CachedSearches (ProductCode, Details, Product) VALUES (?,?,?)";
+	public static final String CACHE_SEARCH_QUERY = "Select Product FROM CachedSearches WHERE ProductCode = ?";
+	 
 	public static final int USERNAME_MIN_LENGTH = 4;
 	public static final int USERNAME_MAX_LENGTH = 30;
 	
@@ -52,6 +62,54 @@ public class DatabaseManager {
 		} catch (Exception e) {
 			Log.error("Error initializing database", e);
 		}
+	}
+	
+	public DatabaseManager() {
+	}
+	
+	// In database the timestamp is of data type timestamp and will update automatically
+	public synchronized void cacheProduct(String productCode, String details, Product prod) {
+		byte[] binaryProduct = null;
+		try {
+			binaryProduct = Serializer.serialize(prod);
+		} catch (IOException e) {
+			Log.error("Error serializing product object");
+		}
+		PreparedStatement stmt = null;
+		
+		java.sql.Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(DB_URL, ROOT, PASS);
+		
+			stmt = conn.prepareStatement(CACHE_QUERY);
+			stmt.setString(1, productCode);
+			stmt.setString(2, details);
+			stmt.setBytes(3, binaryProduct);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			Log.error("Error caching information");
+		}
+		
+	}
+	
+	public synchronized Product cacheSearch(String productCode) {
+		java.sql.Connection conn = null;
+		PreparedStatement stmt2 = null;
+		Product retrievedProduct = null;
+		try {
+			conn = DriverManager.getConnection(DB_URL, ROOT, PASS);
+			stmt2 = conn.prepareStatement(CACHE_SEARCH_QUERY);
+			byte[] retrievedBytes = null;
+			stmt2.setString(1, productCode);
+			ResultSet rs = stmt2.executeQuery();
+			while (rs.next()) {
+				retrievedBytes = rs.getBytes("Product");
+			}
+			retrievedProduct = (Product) Serializer.deserialize(retrievedBytes);
+		} catch (SQLException | ClassNotFoundException | IOException e) {
+			Log.error("Error retrieving product");
+		}
+		return retrievedProduct;
 	}
 	
 	// Returns true if the user is authorized, otherwise false
