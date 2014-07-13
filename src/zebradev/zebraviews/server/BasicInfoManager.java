@@ -45,8 +45,10 @@ public class BasicInfoManager {
 		
 		if (!finished)
 		{
-			this.fail("Basic info mining taking too long", null);
-			return;
+			//this.fail("Basic info mining taking too long", null);
+			Log.info("Basic info mining took " + 
+					(System.nanoTime()-startTime) / (Math.pow(10, 9)) + " seconds");
+			Log.warn("Basic info mining took too long! Ignoring some results!");
 		}
 		else
 		{
@@ -54,6 +56,9 @@ public class BasicInfoManager {
 					(System.nanoTime()-startTime) / (Math.pow(10, 9)) + " seconds");
 		}
 		
+		// Include more sophisticated test in the future....
+		// For example, keep a list of attributes that each processor successfully
+		// retrieved, and then check if we have a full set
 		boolean succeeded = false;
 		for (Processor processor : processors)
 		{
