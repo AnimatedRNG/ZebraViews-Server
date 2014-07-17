@@ -17,7 +17,6 @@
 
 package zebradev.zebraviews.processor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +28,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.jsoup.Jsoup;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import zebradev.zebraviews.common.ConfigManager;
@@ -106,6 +106,7 @@ public class AmazonProcessor extends Processor
         params.put("AssociateTag", "zebra02a-20");
 
         String requestURL = helper.sign(params);
+        System.out.println(requestURL);
         return requestURL;
 	}
 	
@@ -116,8 +117,9 @@ public class AmazonProcessor extends Processor
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(requestUrl);
-        Node itemNode = doc.getElementsByTagName(itemTag).item(0);
-        item = itemNode.getTextContent();
+        Element itemNode = (Element) doc.getElementsByTagName("Item").item(0);
+        Node fetchNode = itemNode.getElementsByTagName(itemTag).item(0);
+        item = fetchNode.getTextContent();
         
         return item;
     }
@@ -131,6 +133,7 @@ public class AmazonProcessor extends Processor
 	protected void onExecute(Product product) throws ProcessingException
 	{
 		List<String> prices = new ArrayList<String>();
+		boolean categoryFailed = false;
 		String title = "";
 		String description = "";
 		String asin = "";
@@ -138,6 +141,13 @@ public class AmazonProcessor extends Processor
 		String requestUrl = this.constructRequestUrl();
 		Double averageRating = 0.0;
 		String price = "";
+		String category = "";
+		
+		try {
+			category = fetchItem(requestUrl, "ProductGroup");
+		} catch (Exception e) {
+			categoryFailed = true;
+		}
 		
 		try
 		{
@@ -145,7 +155,18 @@ public class AmazonProcessor extends Processor
 		} 
 		catch (Exception e)
 		{
-			Log.warn("AmazonProcessor", "Failed to fetch title");
+			if (categoryFailed) {
+				throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_BOTH,
+					"Failed to fetch category and name", e);
+			}
+			
+			throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_NAME,
+					"Failed to fetch name", e);
+		}
+		
+		if (categoryFailed) {
+			throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_CATEGORY,
+					"Failed to fetch category", null);
 		}
 		
 		try
@@ -175,28 +196,51 @@ public class AmazonProcessor extends Processor
 			if (price != null)    
 			{
 				price = price.substring(price.indexOf('$') + 1);
-				prices.add(price);
+				if (!price.equals("Too low to display"))
+					prices.add(price);
 			}
+		}	
+		catch (Exception e) 
+		{
+		}
 		
+		try
+		{
 			price = fetchItem(requestUrl, "LowestNewPrice");
 			if (price != null)    
 			{
 				price = price.substring(price.indexOf('$') + 1);
-				prices.add(price);
+				if (!price.equals("Too low to display"))
+					prices.add(price);
 			}
-			
+		}
+		
+		catch (Exception e) 
+		{
+		}
+		
+		try
+		{
 			price = fetchItem(requestUrl, "LowestUsedPrice");
 			if (price != null)    
 			{
 				price = price.substring(price.indexOf('$') + 1);
-				prices.add(price);
+				if (!price.equals("Too low to display"))
+					prices.add(price);
 			}
+		}
+		catch (Exception e) 
+		{
+		}
 		
+		try
+		{
 			price = fetchItem(requestUrl, "ListPrice");
 			if (price != null)    
 			{
 				price = price.substring(price.indexOf('$') + 1);
-				prices.add(price);
+				if (!price.equals("Too low to display"))
+					prices.add(price);
 			}
 		}
 		catch (Exception e) 
@@ -207,8 +251,10 @@ public class AmazonProcessor extends Processor
 			{
 			product.putTop("price", prices);
 			}
+		
 		product.putTop("product_name", title);
 		product.putTop("asin", asin);
+		product.putTop("category", category);
 		        
 		reviewsUrl = this.constructProductReviewUrl(asin);
 		
