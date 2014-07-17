@@ -25,7 +25,7 @@ public enum Requests {
 	UPC ("upc"), ISBN ("isbn"), EAN ("ean"), JAN ("jan"),
 	LOGIN_RESPONSE ("login_response"), STATUS_SUCCESS ("SUCCESS"),
 	STATUS_FAILURE ("FAILURE"), SIGNUP_RESPONSE ("signup_response"),
-	ESSENTIAL_NAME ("name"), ESSENTIAL_CATEGORY ("category"), /*Must have both*/ 
+	ESSENTIAL_NAME ("name"), ESSENTIAL_CATEGORY ("category"), ESSENTIAL_BOTH ("both"), 
 	SEARCH_RESPONSE_IMMEDIATE ("search_response_immediate"), 
 	SEARCH_RESPONSE_INITIAL ("search_response_initial"), /*Add fail reasons here*/
 	REVIEW_RESPONSE ("review_response"); // A lot more....

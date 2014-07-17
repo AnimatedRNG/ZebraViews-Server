@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import zebradev.zebraviews.common.ConfigManager;
+import zebradev.zebraviews.common.Requests;
 import zebradev.zebraviews.common.SignedRequestsHelper;
 
 import com.esotericsoftware.minlog.Log;
@@ -165,7 +166,8 @@ public class AmazonProcessor extends Processor
 		}
 		catch (Exception e)
 		{
-			throw new ProcessingException("AmazonProcessor", "Failed to fetch ASIN", e);
+			throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_BOTH,
+					"Failed to fetch ASIN", e);
 		}
 		try 
 		{

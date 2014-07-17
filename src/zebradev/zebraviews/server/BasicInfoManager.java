@@ -56,13 +56,10 @@ public class BasicInfoManager {
 					(System.nanoTime()-startTime) / (Math.pow(10, 9)) + " seconds");
 		}
 		
-		// Include more sophisticated test in the future....
-		// For example, keep a list of attributes that each processor successfully
-		// retrieved, and then check if we have a full set
 		boolean succeeded = false;
 		for (Processor processor : processors)
 		{
-			if (!processor.failed)
+			if (processor.failed == null) // Add more sophisticated check later
 				succeeded = true;
 		}
 		

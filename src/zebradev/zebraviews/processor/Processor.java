@@ -17,12 +17,14 @@
 
 package zebradev.zebraviews.processor;
 
+import zebradev.zebraviews.common.Requests;
+
 import com.esotericsoftware.minlog.Log;
 
 public abstract class Processor implements Runnable {
 	
 	private Product product;
-	public boolean failed;
+	public Requests failed;
 	
 	@Override
 	public void run() {
@@ -32,13 +34,13 @@ public abstract class Processor implements Runnable {
 				this.onExecute(this.product);
 			} catch (ProcessingException e) {
 				Log.error("Processor " + e.getProcessor() + " failed", e);
-				this.failed = true;
+				this.failed = e.getEssentialFailed();
 			}
 		}
 		else
 		{
 			Log.error("Product object not supplied!");
-			this.failed = true;
+			this.failed = Requests.ESSENTIAL_BOTH;
 		}
 	}
 	
