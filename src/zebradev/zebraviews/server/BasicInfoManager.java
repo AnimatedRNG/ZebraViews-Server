@@ -56,14 +56,25 @@ public class BasicInfoManager {
 					(System.nanoTime()-startTime) / (Math.pow(10, 9)) + " seconds");
 		}
 		
-		boolean succeeded = false;
+		// Assume they all failed
+		boolean succeededName = false;
+		boolean succeededCategory = false;
 		for (Processor processor : processors)
 		{
-			if (processor.failed == null) // Add more sophisticated check later
-				succeeded = true;
+			if (processor.failed == Requests.ESSENTIAL_NAME)
+				succeededCategory = true;
+			else if (processor.failed == Requests.ESSENTIAL_NAME)
+				succeededName = true;
+			else if (processor.failed == null)
+			{
+				succeededName = true;
+				succeededCategory = true;
+				break;
+			}
+			// And set name & category to true if they didn't fail
 		}
 		
-		if (!succeeded)
+		if (!succeededName || !succeededCategory)
 		{
 			this.fail("Basic info mining failed to find basic info", new RuntimeException());
 			return;
