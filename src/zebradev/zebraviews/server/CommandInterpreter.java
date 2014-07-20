@@ -68,6 +68,7 @@ public class CommandInterpreter {
 					Log.info("Stopping server....");
 					this.serverManager.stop();
 					this.serverManager = null;
+					this.clientManager = null;
 					Log.info("Server stopped");
 				}
 				else
