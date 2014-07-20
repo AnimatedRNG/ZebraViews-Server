@@ -17,9 +17,7 @@
 
 package zebradev.zebraviews.processor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -36,7 +34,6 @@ import zebradev.zebraviews.common.Requests;
 import zebradev.zebraviews.common.SignedRequestsHelper;
 
 import com.esotericsoftware.minlog.Log;
-
 
 public class AmazonProcessor extends Processor
 {
@@ -131,7 +128,7 @@ public class AmazonProcessor extends Processor
 	@Override
 	protected void onExecute(Product product) throws ProcessingException
 	{
-		List<String> prices = new ArrayList<String>();
+		TreeMap<String, String> prices = new TreeMap<String, String>();
 		boolean categoryFailed = false;
 		String title = "";
 		String description = "";
@@ -139,7 +136,10 @@ public class AmazonProcessor extends Processor
 		String reviewsUrl = "";
 		String requestUrl = this.constructRequestUrl();
 		Double averageRating = 0.0;
-		String price = "";
+		String salePrice = null;
+		String listPrice = null;
+		String usedPrice = null;
+		String newPrice = null;
 		String category = "";
 		
 		try {
@@ -191,27 +191,10 @@ public class AmazonProcessor extends Processor
 		}
 		try 
 		{
-			price = fetchItem(requestUrl, "SalePrice");
-			if (price != null)    
-			{
-				price = price.substring(price.indexOf('$') + 1);
-				if (!price.equals("Too low to display"))
-					prices.add(price);
-			}
-		}	
-		catch (Exception e) 
-		{
-		}
-		
-		try
-		{
-			price = fetchItem(requestUrl, "LowestNewPrice");
-			if (price != null)    
-			{
-				price = price.substring(price.indexOf('$') + 1);
-				if (!price.equals("Too low to display"))
-					prices.add(price);
-			}
+			salePrice = fetchItem(requestUrl, "SalePrice");
+			if (salePrice != null)    
+				if (!salePrice.equals("Too low to display"))
+					prices.put("Sale price", salePrice.substring(salePrice.indexOf("$")));
 		}
 		
 		catch (Exception e) 
@@ -220,13 +203,22 @@ public class AmazonProcessor extends Processor
 		
 		try
 		{
-			price = fetchItem(requestUrl, "LowestUsedPrice");
-			if (price != null)    
-			{
-				price = price.substring(price.indexOf('$') + 1);
-				if (!price.equals("Too low to display"))
-					prices.add(price);
-			}
+			newPrice = fetchItem(requestUrl, "LowestNewPrice");
+			if (newPrice != null)    
+				if (!newPrice.equals("Too low to display"))
+					prices.put("New price", newPrice.substring(newPrice.indexOf("$")));
+		}
+		
+		catch (Exception e) 
+		{
+		}
+		
+		try
+		{
+			usedPrice = fetchItem(requestUrl, "LowestUsedPrice");
+			if (usedPrice != null)    
+				if (!usedPrice.equals("Too low to display"))
+					prices.put("Used price", usedPrice.substring(usedPrice.indexOf("$")));
 		}
 		catch (Exception e) 
 		{
@@ -234,23 +226,16 @@ public class AmazonProcessor extends Processor
 		
 		try
 		{
-			price = fetchItem(requestUrl, "ListPrice");
-			if (price != null)    
-			{
-				price = price.substring(price.indexOf('$') + 1);
-				if (!price.equals("Too low to display"))
-					prices.add(price);
-			}
+			listPrice = fetchItem(requestUrl, "ListPrice");
+			if (listPrice != null)    
+				if (!listPrice.equals("Too low to display"))
+					prices.put("List price", listPrice.substring(listPrice.indexOf("$")));
 		}
 		catch (Exception e) 
 		{
 		}
 				
-		if (prices != null)    
-			{
-			product.putTop("price", prices);
-			}
-		
+		product.putTop("price", prices);
 		product.putTop("product_name", title);
 		product.putTop("asin", asin);
 		product.putTop("category", category);
