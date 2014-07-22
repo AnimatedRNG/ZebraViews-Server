@@ -30,10 +30,11 @@ import zebradev.zebraviews.server.ServerManager;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Listener.ThreadedListener;
 import com.esotericsoftware.minlog.Log;
 
-public class FakeClientManager {
+public class ClientManager {
 	private ConfigManager serverConfig;
 	private ConfigManager clientConfig;
 	
@@ -43,11 +44,14 @@ public class FakeClientManager {
 	public final static String CONFIG_FILE = "config/client_config.xml";
 	public final static String CONFIG_ELEMENT = "Client";
 	
-	public FakeClientManager() throws IOException, ParserConfigurationException, SAXException {
-		this.serverConfig = new ConfigManager(ServerManager.CONFIG_FILE,
-				ServerManager.CONFIG_ELEMENT);
-		this.clientConfig = new ConfigManager(FakeClientManager.CONFIG_FILE,
-				FakeClientManager.CONFIG_ELEMENT);
+	public ClientManager(Listener listener, String serverConfigFile, String clientConfigFile)
+			throws IOException, ParserConfigurationException, SAXException {
+		
+		String serverFile = (serverConfigFile == null) ? ServerManager.CONFIG_FILE : serverConfigFile;
+		String clientFile = (clientConfigFile == null) ? ClientManager.CONFIG_FILE : clientConfigFile;
+		
+		this.serverConfig = new ConfigManager(serverFile, ServerManager.CONFIG_ELEMENT);
+		this.clientConfig = new ConfigManager(clientFile, ClientManager.CONFIG_ELEMENT);
 		
 		int port = Integer.parseInt(serverConfig.get("port"));
 		String ip = serverConfig.get("server_ip");
@@ -58,7 +62,7 @@ public class FakeClientManager {
 		
 		this.zebraViewsClient.connect(timeout, ip, port);
 		
-		this.zebraViewsClient.addListener(new ThreadedListener(new ClientRequestListener()));
+		this.zebraViewsClient.addListener(new ThreadedListener(listener));
 		
 		// Remove this once we add our serializer
 	    Kryo kryo = this.zebraViewsClient.getKryo();

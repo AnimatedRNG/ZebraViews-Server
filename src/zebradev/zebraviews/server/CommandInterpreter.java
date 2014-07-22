@@ -24,14 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import zebradev.zebraviews.fakeclient.ClientCommands;
-import zebradev.zebraviews.fakeclient.FakeClientManager;
+import zebradev.zebraviews.fakeclient.ClientManager;
+import zebradev.zebraviews.fakeclient.ClientRequestListener;
 
 import com.esotericsoftware.minlog.Log;
 
 public class CommandInterpreter {
 
 	private ServerManager serverManager;
-	private FakeClientManager clientManager;
+	private ClientManager clientManager;
 	
 	public void interpret(String input) {
 		
@@ -119,7 +120,7 @@ public class CommandInterpreter {
 						Log.warn("Client already running!");
 						return;
 					}
-					this.clientManager = new FakeClientManager();
+					this.clientManager = new ClientManager(new ClientRequestListener(), null, null);
 				} catch (Exception e) {
 					Log.error("Exception occurred connecting client!", e);
 					Log.warn("Connection was not established");
