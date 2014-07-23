@@ -18,6 +18,7 @@
 package zebradev.zebraviews.common;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,6 +37,12 @@ public class ConfigManager extends Hashtable<String, String> {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser saxParser = factory.newSAXParser();
 		saxParser.parse(fileName, new ConfigHandler(this, elementName));
+	}
+	
+	public ConfigManager(InputStream fileStream, String elementName) throws ParserConfigurationException, SAXException, IOException {
+		SAXParserFactory factory = SAXParserFactory.newInstance();
+		SAXParser saxParser = factory.newSAXParser();
+		saxParser.parse(fileStream, new ConfigHandler(this, elementName));
 	}
 	
 	private class ConfigHandler extends DefaultHandler {
