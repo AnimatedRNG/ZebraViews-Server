@@ -120,7 +120,7 @@ public class DatabaseManager {
 		String username = ((String) object.get("username")).toLowerCase();
 		String password = ((String) object.get("password"));
 		
-		if (!DatabaseManager.verifyValidity(username, password, ""))
+		if (!this.verifyValidity(username, password, ""))
 			return false;
 		
 		List<LoginTask> tasks = null;
@@ -153,7 +153,7 @@ public class DatabaseManager {
 		String password = ((String) object.get("password"));
 		String details = ((String) object.get("details"));
 		
-		if (!DatabaseManager.verifyValidity(username, password, details))
+		if (!this.verifyValidity(username, password, details))
 			return false;
 		
 		List<LoginTask> tasks = null;
@@ -163,7 +163,7 @@ public class DatabaseManager {
 					.addParameter("NAME", username).executeAndFetch(LoginTask.class);
 			if (tasks.size() > 0)
 			{
-				Log.warn("Username " + username + "already exists in database");
+				Log.warn("Username " + username + " already exists in database");
 				return false;
 			}
 			
@@ -181,7 +181,7 @@ public class DatabaseManager {
 		}
 	}
 	
-	public static boolean verifyValidity(String username, String password, String details) {
+	private boolean verifyValidity(String username, String password, String details) {
 		if (username.length() <= USERNAME_MAX_LENGTH && username.length() >= USERNAME_MIN_LENGTH)
 		{
 			if (password.length() <= PASSWORD_MAX_LENGTH && password.length() >= PASSWORD_MIN_LENGTH)
