@@ -17,6 +17,8 @@
 
 package zebradev.zebraviews.processor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -37,8 +39,15 @@ public class Product extends ConcurrentLinkedQueue<TreeMap<String, Object>> {
 		this.peek().putAll(addMap);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public synchronized void putTop(String attributeName, Object object) {
-		this.peek().put(attributeName, object);
+		
+		TreeMap<String, Object> top = this.peek();
+		
+		if (top.containsKey(attributeName) && top.get(attributeName) instanceof ArrayList)
+			((List<Object>) top.get(attributeName)).add(object); 
+		else
+			top.put(attributeName, object);
 	}
 	
 	public synchronized void removeFromTop(String attributeName) {

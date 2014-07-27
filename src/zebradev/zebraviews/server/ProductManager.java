@@ -17,18 +17,12 @@
 
 package zebradev.zebraviews.server;
 
+import java.util.ArrayList;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import zebradev.zebraviews.common.ConfigManager;
-import zebradev.zebraviews.common.Requests;
-import zebradev.zebraviews.processor.AmazonProcessor;
-import zebradev.zebraviews.processor.Processor;
 import zebradev.zebraviews.processor.Product;
 
-import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.minlog.Log;
 
 public class ProductManager implements Runnable {
@@ -43,6 +37,8 @@ public class ProductManager implements Runnable {
 		this.product.putAllTop(request);
 		this.product.putTop("name", "top");
 		this.product.putTop("stage", "basic-info");
+		this.product.putTop("product_name", new ArrayList<Object>());
+		this.product.putTop("category", new ArrayList<Object>());
 		
 		ConfigManager productManagerConfig;
 		try {
