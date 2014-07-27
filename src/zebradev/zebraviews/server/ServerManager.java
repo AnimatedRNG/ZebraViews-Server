@@ -37,12 +37,14 @@ public class ServerManager {
 	private ConfigManager handler;
 	private Server zebraViewsServer;
 	public boolean stop;
+	public final static int writeBufferSize = 16384;
+	public final static int objectBufferSize = 2048;
 	
 	public ServerManager() throws IOException, ParserConfigurationException, SAXException {
 		this.handler = new ConfigManager(CONFIG_FILE, CONFIG_ELEMENT);
 		int port = Integer.parseInt(handler.get("port"));
 		
-		this.zebraViewsServer = new Server();
+		this.zebraViewsServer = new Server(writeBufferSize, objectBufferSize);
 	    new Thread(zebraViewsServer).start();
 	    zebraViewsServer.bind(port);
 	    

@@ -18,7 +18,6 @@
 package zebradev.zebraviews.fakeclient;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,22 +43,23 @@ public class ClientManager {
 	
 	public final static String CONFIG_FILE = "config/client_config.xml";
 	public final static String CONFIG_ELEMENT = "Client";
+	public final static int writeBufferSize = 8192;
+	public final static int objectBufferSize = 4096;
 	
-	public ClientManager(Listener listener, InputStream serverConfigFile, InputStream clientConfigFile)
+	public ClientManager(Listener listener, String serverConfigFile, String clientConfigFile)
 			throws IOException, ParserConfigurationException, SAXException {
 		
-		this.serverConfig = (serverConfigFile == null) ?
-				new ConfigManager(ServerManager.CONFIG_FILE, ServerManager.CONFIG_ELEMENT) :
-					new ConfigManager(serverConfigFile, ServerManager.CONFIG_ELEMENT);
-		this.clientConfig = (clientConfigFile == null) ?
-				new ConfigManager(ClientManager.CONFIG_FILE, ClientManager.CONFIG_ELEMENT) :
-					new ConfigManager(clientConfigFile, ClientManager.CONFIG_ELEMENT);
+		String serverFile = (serverConfigFile == null) ? ServerManager.CONFIG_FILE : serverConfigFile;
+		String clientFile = (clientConfigFile == null) ? ClientManager.CONFIG_FILE : clientConfigFile;
+		
+		this.serverConfig = new ConfigManager(serverFile, ServerManager.CONFIG_ELEMENT);
+		this.clientConfig = new ConfigManager(clientFile, ClientManager.CONFIG_ELEMENT);
 		
 		int port = Integer.parseInt(serverConfig.get("port"));
 		String ip = serverConfig.get("server_ip");
 		int timeout = Integer.parseInt(clientConfig.get("timeout"));
 		
-		this.zebraViewsClient = new Client();
+		this.zebraViewsClient = new Client(writeBufferSize, objectBufferSize);
 		new Thread(zebraViewsClient).start();
 		
 		this.zebraViewsClient.connect(timeout, ip, port);
