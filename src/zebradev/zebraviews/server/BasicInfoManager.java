@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import zebradev.zebraviews.common.Requests;
 import zebradev.zebraviews.processor.AmazonProcessor;
+import zebradev.zebraviews.processor.BestBuyProcessor;
 import zebradev.zebraviews.processor.Processor;
 import zebradev.zebraviews.processor.Product;
 
@@ -90,6 +91,7 @@ public class BasicInfoManager {
 	private List<Processor> getProcessors() {
 		List<Processor> processorList = new ArrayList<Processor>();
 		processorList.add(new AmazonProcessor(this.product));
+		processorList.add(new BestBuyProcessor(this.product));
 		return processorList;
 	}
 	
