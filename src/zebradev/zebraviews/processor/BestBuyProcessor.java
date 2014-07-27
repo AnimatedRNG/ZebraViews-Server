@@ -56,8 +56,8 @@ public class BestBuyProcessor extends Processor{
 	@Override
 	protected void onExecute(Product product) throws ProcessingException {
 		if (((String) this.getProduct().getTop("product_type")).toUpperCase().equals("ISBN"))
-			throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_BOTH,
-				"Failed to fetch ASIN", null);
+			throw new ProcessingException("BestBuyProcessor", Requests.ESSENTIAL_BOTH,
+				"Failed to fetch category and name", null);
 
 		String requestUrl = constructRequestUrl();
 		String name = "";
