@@ -108,7 +108,7 @@ public class BestBuyProcessor extends Processor{
 		bestBuyOtherInfo.put("name", "BestBuyProcessor_initial");
 		bestBuyOtherInfo.put("description", description);
 		if (averageRating != 0.0)
-		   product.putTop("average rating", averageRating);
+		   product.putTop("average_rating", averageRating);
 		product.add(bestBuyOtherInfo);
 	}
 }

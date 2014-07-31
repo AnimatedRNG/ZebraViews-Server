@@ -256,7 +256,7 @@ public class AmazonProcessor extends Processor
 		amazonOtherInfo.put("name", "AmazonProcessor_initial");
 		amazonOtherInfo.put("description", description);
 		if (averageRating != 0.0)
-		   product.putTop("average rating", averageRating);
+		   product.putTop("average_rating", averageRating);
 		product.add(amazonOtherInfo);
 	}
 }
