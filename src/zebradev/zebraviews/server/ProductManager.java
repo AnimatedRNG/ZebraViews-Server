@@ -40,6 +40,7 @@ public class ProductManager implements Runnable {
 		this.product.putTop("product_name", new ArrayList<Object>());
 		this.product.putTop("category", new ArrayList<Object>());
 		this.product.putTop("average_rating", new ArrayList<Object>());
+		this.product.putTop("price", new ArrayList<Object>());
 		
 		ConfigManager productManagerConfig;
 		try {

@@ -47,10 +47,10 @@ public class BestBuyProcessor extends Processor{
 	
 	public String constructRequestUrl() {
 		String upc = (String) this.getProduct().getTop("product_code");
-		String requestUrl = "http://api.remix.bestbuy.com/v1/products(upc=" + upc + "*)" +
-			"?show=name,customerReviewAverage,longDescription,department,includedItemList.includedItem&" +
+		String requestURL = "http://api.remix.bestbuy.com/v1/products(upc=" + upc + "*)" +
+			"?show=name,customerReviewAverage,regularPrice,salePrice,longDescription,department,includedItemList.includedItem&" +
 			"apiKey=" + this.bestBuyKey;
-		return requestUrl;
+		return requestURL;
 	}
 	
 	@Override
@@ -59,6 +59,7 @@ public class BestBuyProcessor extends Processor{
 			throw new ProcessingException("BestBuyProcessor", Requests.ESSENTIAL_BOTH,
 				"Failed to fetch category and name", null);
 
+		TreeMap<String, String> prices = new TreeMap<String, String>();
 		String requestUrl = constructRequestUrl();
 		String name = "";
 		String description = "";
@@ -100,8 +101,30 @@ public class BestBuyProcessor extends Processor{
 			averageRating = Double.parseDouble(fetchItem(requestUrl, "customerReviewAverage"));
 		} catch (Exception e) {
 			Log.warn("BestBuyProcessor", "Failed to fetch average rating");
-		}	
+		}
+		try
+		{
+			String salePrice = fetchItem(requestUrl, "salePrice");
+			if (salePrice != null)    
+				prices.put("Sale price", "$" + salePrice);
+		}
+		
+		catch (Exception e) 
+		{
+		}
+		
+		try
+		{
+			String regPrice = fetchItem(requestUrl, "regularPrice");
+			if (regPrice != null)    
+				prices.put("Regular price", "$" + regPrice);
+		}
+		
+		catch (Exception e) 
+		{
+		}
 	
+		product.putTop("price", prices);
 		product.putTop("product_name", name);
 		product.putTop("category", category);
 		TreeMap<String, Object> bestBuyOtherInfo = new TreeMap<String, Object>();
