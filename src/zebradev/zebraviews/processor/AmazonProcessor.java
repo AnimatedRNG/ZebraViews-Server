@@ -90,12 +90,17 @@ public class AmazonProcessor extends Processor
             e.printStackTrace();
             return "product not available";
         }
-		        
+		
+        String productType = ((String) this.getProduct().getTop("product_type")).toUpperCase();
+        
+        if (productType.equals(Requests.UPC_A.value) || productType.equals(Requests.UPC_E.value))
+        	productType = productType.substring(0, 3);
+        
         Map<String, String> params = new HashMap<String, String>();
         params.put("Service", "AWSECommerceService");
         params.put("Version", "2013-08-01");
         params.put("Operation", "ItemLookup");
-        params.put("IdType", ((String) this.getProduct().getTop("product_type")).toUpperCase());
+        params.put("IdType", productType);
         params.put("ItemId", ITEM_ID);
         if (!(((String) this.getProduct().getTop("product_type")).toUpperCase().equals("ASIN")))
         	params.put("SearchIndex", "All");
