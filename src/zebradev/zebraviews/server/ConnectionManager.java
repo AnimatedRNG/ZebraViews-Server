@@ -76,9 +76,11 @@ public class ConnectionManager {
 		{
 			if (loggedIn) loggedIn = false;
 			boolean signedUp = new DatabaseManager(obj).signup();
-			if (signedUp)
+			if (signedUp) {
 				Log.info(this.connection.toString(),
 						"Server successfully signed up user " + obj.get("username"));
+				loggedIn = true;
+			}
 			else
 				Log.info(this.connection.toString(),
 						"Server did not sign up user " + obj.get("username"));
