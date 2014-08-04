@@ -118,7 +118,8 @@ public class AmazonProcessor extends Processor
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(requestUrl);
-        Element itemNode = (Element) doc.getElementsByTagName("Item").item(0);
+        int index = doc.getElementsByTagName("Item").getLength() - 1;
+        Element itemNode = (Element) doc.getElementsByTagName("Item").item(index);
         Node fetchNode = itemNode.getElementsByTagName(itemTag).item(0);
         item = fetchNode.getTextContent();
         
@@ -250,16 +251,16 @@ public class AmazonProcessor extends Processor
 		try 
 		{
 			org.jsoup.nodes.Document doc = Jsoup.connect(reviewsUrl).get();
-				averageRating = Double.parseDouble((doc.select("span.asinReviewsSummary span[class^=sWSprite s_star] span").first().text()).substring(0,2));
+				averageRating = Double.parseDouble((doc.select("span.asinReviewsSummary span[class^=sWSprite s_star] span").first().text()).substring(0,3));
 		    
 		} 
 		catch (Exception e) {
 			Log.warn("Jsoup preliminary scraping failed", e);
 		}
-
+		
 		TreeMap<String, Object> amazonOtherInfo = new TreeMap<String, Object>();
 		amazonOtherInfo.put("name", "AmazonProcessor_initial");
-		amazonOtherInfo.put("description", description);
+		amazonOtherInfo.put("description", Jsoup.parse(description).text());
 		if (averageRating != 0.0)
 		   product.putTop("average_rating", averageRating);
 		product.add(amazonOtherInfo);
