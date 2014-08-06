@@ -36,6 +36,9 @@ public class ProsperentProcessor extends Processor{
         String item = null;
         
         JSONObject jsonResponse = JSONRequest.getRequest(requestUrl);
+        if (jsonResponse==null)
+			throw new ProcessingException("ProsperentProcessor", Requests.ESSENTIAL_BOTH,
+					"Failed to fetch response", null);
 		JSONArray jsonParsedResponse = (JSONArray) jsonResponse.get("data");
 		JSONObject jsonResponseObject = (JSONObject) jsonParsedResponse.get(0);
 		item = jsonResponseObject.get(itemTag).toString();
@@ -51,6 +54,10 @@ public class ProsperentProcessor extends Processor{
 	
 	@Override
 	protected void onExecute(Product product) throws ProcessingException {
+		if(prosperentkey.equals("")||prosperentkey==null)
+			throw new ProcessingException("ProsperentProcessor", Requests.ESSENTIAL_BOTH,
+					"Failed to fetch API Key", null);
+		
 		if (((String) this.getProduct().getTop("product_type")).toUpperCase().equals("ISBN"))
 			throw new ProcessingException("ProsperentProcessor", Requests.ESSENTIAL_BOTH,
 				"Failed to fetch category and name", null);
