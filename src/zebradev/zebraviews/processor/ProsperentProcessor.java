@@ -5,6 +5,9 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -32,12 +35,11 @@ public class ProsperentProcessor extends Processor{
 	{
         String item = null;
         
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(requestUrl);
-        Node fetchNode = doc.getElementsByTagName(itemTag).item(0);
-        item = fetchNode.getTextContent();
-        
+        JSONObject jsonResponse = JSONRequest.getRequest(requestUrl);
+		JSONArray jsonParsedResponse = (JSONArray) jsonResponse.get("data");
+		JSONObject jsonResponseObject = (JSONObject) jsonParsedResponse.get(0);
+		item = jsonResponseObject.get(itemTag).toString();
+             
         return item;
     }
 	
@@ -57,12 +59,30 @@ public class ProsperentProcessor extends Processor{
 		String name = "";
 		String description = "";
 		String price = "";
+		String category = "";
+		Boolean categoryFailed = false;
 
+		try {
+			category = fetchItem(requestUrl, "category");
+		} catch (Exception e) {
+			categoryFailed = true;
+		}
+		
 		try {
 			name = fetchItem(requestUrl, "keyword");
 		} catch (Exception e) {
-			throw new ProcessingException("ProsperentProcessor", Requests.ESSENTIAL_BOTH,
-				"Failed to fetch name", e);
+			if (categoryFailed) {
+				throw new ProcessingException("ProsperentProcessor", Requests.ESSENTIAL_BOTH,
+					"Failed to fetch category and name", e);
+			}
+			
+			throw new ProcessingException("ProsperentProcessor", Requests.ESSENTIAL_NAME,
+					"Failed to fetch name", e);
+		}
+		
+		if (categoryFailed) {
+			throw new ProcessingException("ProsperentProcessor", Requests.ESSENTIAL_CATEGORY,
+					"Failed to fetch category", null);
 		}
 
 		try {
@@ -74,17 +94,15 @@ public class ProsperentProcessor extends Processor{
 		try {
 			price = fetchItem(requestUrl, "price");
 		} catch (Exception e) {
-			Log.warn("BestBuyProcessor", "Failed to fetch price");
+			Log.warn("ProsperentProcessor", "Failed to fetch price");
 		}	
 	
 		product.putTop("product_name", name);
+		product.putTop("category", category);
 		TreeMap<String, Object> prosperentOtherInfo = new TreeMap<String, Object>();
 		prosperentOtherInfo.put("name", "ProsperentProcessor_initial");
 		prosperentOtherInfo.put("description", description);
 		prosperentOtherInfo.put("price", price);
 		product.add(prosperentOtherInfo);
-		
-		throw new ProcessingException("ProsperentProcessor", Requests.ESSENTIAL_CATEGORY,
-				"Failed to fetch category", null);
 	}
 }
