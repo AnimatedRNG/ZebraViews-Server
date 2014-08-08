@@ -1,15 +1,8 @@
 package zebradev.zebraviews.processor;
 
 import java.util.TreeMap;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 import zebradev.zebraviews.common.ConfigManager;
 import zebradev.zebraviews.common.Requests;
@@ -17,7 +10,7 @@ import zebradev.zebraviews.common.Requests;
 import com.esotericsoftware.minlog.Log;
 
 public class ProsperentProcessor extends Processor{
-	private String prosperentkey = "";
+	private String prosperentKey = "";
 	
 	public ProsperentProcessor(Product product) {
 		this.setProduct(product);
@@ -28,7 +21,7 @@ public class ProsperentProcessor extends Processor{
 			Log.error("Error reading config file!", e);
 			return;
 		}
-		this.prosperentkey = config.get("prosperent_key");
+		this.prosperentKey = config.get("prosperent_key");
 	}
 
 	public String fetchItem(String requestUrl, String itemTag) throws Exception
@@ -48,13 +41,13 @@ public class ProsperentProcessor extends Processor{
 	
 	public String constructRequestUrl() {
 		String upc = (String) this.getProduct().getTop("product_code");
-		String requestUrl = "http://api.prosperent.com/api/search?api_key="+prosperentkey+"&query="+upc+"&limit=1";
+		String requestUrl = "http://api.prosperent.com/api/search?api_key="+prosperentKey+"&query="+upc+"&limit=1";
 		return requestUrl;
 	}
 	
 	@Override
 	protected void onExecute(Product product) throws ProcessingException {
-		if(prosperentkey.equals("")||prosperentkey==null)
+		if(prosperentKey.equals("")||prosperentKey==null)
 			throw new ProcessingException("ProsperentProcessor", Requests.ESSENTIAL_BOTH,
 					"Failed to fetch API Key", null);
 		
@@ -65,9 +58,10 @@ public class ProsperentProcessor extends Processor{
 		String requestUrl = constructRequestUrl();
 		String name = "";
 		String description = "";
-		String price = "";
+		TreeMap<String, String> prices = new TreeMap<String, String>();
 		String category = "";
 		Boolean categoryFailed = false;
+		String price = "";
 
 		try {
 			category = fetchItem(requestUrl, "category");
@@ -102,14 +96,16 @@ public class ProsperentProcessor extends Processor{
 			price = fetchItem(requestUrl, "price");
 		} catch (Exception e) {
 			Log.warn("ProsperentProcessor", "Failed to fetch price");
-		}	
+		}
+		prices.put("Regular Price", "$" + price);
 	
 		product.putTop("product_name", name);
 		product.putTop("category", category);
+		product.putTop("price", prices);
+		
 		TreeMap<String, Object> prosperentOtherInfo = new TreeMap<String, Object>();
 		prosperentOtherInfo.put("name", "ProsperentProcessor_initial");
 		prosperentOtherInfo.put("description", description);
-		prosperentOtherInfo.put("price", price);
 		product.add(prosperentOtherInfo);
 	}
 }

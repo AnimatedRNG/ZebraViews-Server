@@ -37,10 +37,10 @@ import com.esotericsoftware.minlog.Log;
 
 public class AmazonProcessor extends Processor
 {
-	private String AWS_ACCESS_KEY_ID;
-	private String AWS_SECRET_KEY;
-	private String ENDPOINT;
-	private String ITEM_ID;
+	private String awsAccessKey;
+	private String awsSecretKey;
+	private String endpoint;
+	private String itemID;
 
 	public AmazonProcessor(Product product) {
 		this.setProduct(product);
@@ -51,30 +51,30 @@ public class AmazonProcessor extends Processor
 			Log.error("Error reading config file!", e);
 			return;
 		}
-		this.AWS_ACCESS_KEY_ID = config.get("aws_access_key_id");
-		this.AWS_SECRET_KEY = config.get("aws_secret_key");
-		this.ENDPOINT = config.get("endpoint");
-		this.ITEM_ID = (String) this.getProduct().getTop("product_code");
+		this.awsAccessKey = config.get("aws_access_key_id");
+		this.awsSecretKey = config.get("aws_secret_key");
+		this.endpoint = config.get("endpoint");
+		this.itemID = (String) this.getProduct().getTop("product_code");
 	}
 
 	public String getAccessKey()
 	{
-		return AWS_ACCESS_KEY_ID;
+		return awsAccessKey;
 	}
 
 	public String getSecretKey()
 	{
-		return AWS_SECRET_KEY;
+		return awsSecretKey;
 	}	
 	
 	public String getEndpoint()
 	{
-		return ENDPOINT;
+		return endpoint;
 	}	
 	
 	public String getItemID()
 	{
-		return ITEM_ID;
+		return itemID;
 	}		
 	
 	public String constructRequestUrl()
@@ -82,7 +82,7 @@ public class AmazonProcessor extends Processor
         SignedRequestsHelper helper;
         try
         {
-            helper = SignedRequestsHelper.getInstance(ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY);
+            helper = SignedRequestsHelper.getInstance(endpoint, awsAccessKey, awsSecretKey);
         }
         
         catch (Exception e)
@@ -101,7 +101,7 @@ public class AmazonProcessor extends Processor
         params.put("Version", "2013-08-01");
         params.put("Operation", "ItemLookup");
         params.put("IdType", productType);
-        params.put("ItemId", ITEM_ID);
+        params.put("ItemId", itemID);
         if (!(((String) this.getProduct().getTop("product_type")).toUpperCase().equals("ASIN")))
         	params.put("SearchIndex", "All");
         params.put("ResponseGroup", "Large");
@@ -134,6 +134,10 @@ public class AmazonProcessor extends Processor
 	@Override
 	protected void onExecute(Product product) throws ProcessingException
 	{
+		if(awsAccessKey.equals("")||awsAccessKey==null||awsSecretKey.equals("")||awsSecretKey==null)
+			throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_BOTH,
+					"Failed to fetch API Key(s)", null);
+		
 		TreeMap<String, String> prices = new TreeMap<String, String>();
 		boolean categoryFailed = false;
 		String title = "";
@@ -188,7 +192,7 @@ public class AmazonProcessor extends Processor
 		if (!(((String) this.getProduct().getTop("product_type")).toUpperCase()).equals("ASIN"))
 			asin = fetchItem(requestUrl, "ASIN");
 		else
-			asin = ITEM_ID;
+			asin = itemID;
 		}
 		catch (Exception e)
 		{

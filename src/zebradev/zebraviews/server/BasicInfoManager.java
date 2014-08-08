@@ -11,6 +11,7 @@ import zebradev.zebraviews.processor.AmazonProcessor;
 import zebradev.zebraviews.processor.BestBuyProcessor;
 import zebradev.zebraviews.processor.Processor;
 import zebradev.zebraviews.processor.Product;
+import zebradev.zebraviews.processor.ProsperentProcessor;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.minlog.Log;
@@ -92,6 +93,7 @@ public class BasicInfoManager {
 		List<Processor> processorList = new ArrayList<Processor>();
 		processorList.add(new AmazonProcessor(this.product));
 		processorList.add(new BestBuyProcessor(this.product));
+		processorList.add(new ProsperentProcessor(this.product));
 		return processorList;
 	}
 	
