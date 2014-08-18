@@ -43,8 +43,8 @@ public class ClientManager {
 	
 	public final static String CONFIG_FILE = "config/client_config.xml";
 	public final static String CONFIG_ELEMENT = "Client";
-	public final static int writeBufferSize = 8192;
-	public final static int objectBufferSize = 4096;
+	public final static int writeBufferSize = 16384;
+	public final static int objectBufferSize = 8192;
 	
 	public ClientManager(Listener listener, String serverConfigFile, String clientConfigFile)
 			throws IOException, ParserConfigurationException, SAXException {

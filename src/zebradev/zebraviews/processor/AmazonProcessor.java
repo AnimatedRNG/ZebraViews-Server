@@ -41,6 +41,7 @@ public class AmazonProcessor extends Processor
 	private String awsSecretKey;
 	private String endpoint;
 	private String itemID;
+	private boolean useAsin;
 
 	public AmazonProcessor(Product product) {
 		this.setProduct(product);
@@ -77,7 +78,7 @@ public class AmazonProcessor extends Processor
 		return itemID;
 	}		
 	
-	public String constructRequestUrl()
+	public String constructRequestUrl() throws Exception
 	{
         SignedRequestsHelper helper;
         try
@@ -106,8 +107,15 @@ public class AmazonProcessor extends Processor
         	params.put("SearchIndex", "All");
         params.put("ResponseGroup", "Large");
         params.put("AssociateTag", "zebra02a-20");
+        params.put("Sort", "relevancerank");
 
         String requestURL = helper.sign(params);
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(requestURL);
+        int numberOfItems = doc.getElementsByTagName("Item").getLength();
+        if (numberOfItems != 1)
+        	useAsin = true;
         return requestURL;
 	}
 	
@@ -118,8 +126,7 @@ public class AmazonProcessor extends Processor
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(requestUrl);
-        int index = doc.getElementsByTagName("Item").getLength() - 1;
-        Element itemNode = (Element) doc.getElementsByTagName("Item").item(index);
+        Element itemNode = (Element) doc.getElementsByTagName("Item").item(0);
         Node fetchNode = itemNode.getElementsByTagName(itemTag).item(0);
         item = fetchNode.getTextContent();
         
@@ -144,7 +151,17 @@ public class AmazonProcessor extends Processor
 		String description = "";
 		String asin = "";
 		String reviewsUrl = "";
-		String requestUrl = this.constructRequestUrl();
+		String requestUrl = "";
+
+		try
+		{
+			requestUrl = this.constructRequestUrl();
+		}
+		
+		catch (Exception e) {
+			throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_BOTH,
+					"Failed to construct request URL", e);
+		}
 		Double averageRating = 0.0;
 		String salePrice = null;
 		String listPrice = null;
@@ -152,121 +169,159 @@ public class AmazonProcessor extends Processor
 		String newPrice = null;
 		String category = "";
 		
-		try {
-			category = fetchItem(requestUrl, "ProductGroup");
-		} catch (Exception e) {
-			categoryFailed = true;
-		}
-		
-		try
-		{
-		title = fetchItem(requestUrl, "Title");
-		} 
-		catch (Exception e)
-		{
-			if (categoryFailed) {
-				throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_BOTH,
-					"Failed to fetch category and name", e);
+		if (useAsin) {
+
+			try 
+			{
+				org.jsoup.nodes.Document doc = Jsoup.connect("http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=" + itemID).get();
+				String productLink = doc.select(".newaps [href]").first().toString();
+				asin = productLink.substring(productLink.indexOf("/dp/")+4, productLink.indexOf("dp/") + 13);
+			} 
+			catch (Exception e) {
+				Log.warn("Jsoup preliminary scraping failed", e);
 			}
 			
-			throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_NAME,
-					"Failed to fetch name", e);
-		}
-		
-		if (categoryFailed) {
-			throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_CATEGORY,
-					"Failed to fetch category", null);
-		}
-		
-		try
-		{
-		description = fetchItem(requestUrl, "Content");
-		}
-		catch (Exception e)
-		{
-			Log.warn("AmazonProcessor", "Failed to fetch description");
-		}
-		
-		try
-		{
-		if (!(((String) this.getProduct().getTop("product_type")).toUpperCase()).equals("ASIN"))
-			asin = fetchItem(requestUrl, "ASIN");
-		else
-			asin = itemID;
-		}
-		catch (Exception e)
-		{
-			throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_BOTH,
-					"Failed to fetch ASIN", e);
-		}
-		try 
-		{
-			salePrice = fetchItem(requestUrl, "SalePrice");
-			if (salePrice != null)    
-				if (!salePrice.equals("Too low to display"))
-					prices.put("Sale price", salePrice.substring(salePrice.indexOf("$")));
-		}
-		
-		catch (Exception e) 
-		{
-		}
-		
-		try
-		{
-			newPrice = fetchItem(requestUrl, "LowestNewPrice");
-			if (newPrice != null)    
-				if (!newPrice.equals("Too low to display"))
-					prices.put("New price", newPrice.substring(newPrice.indexOf("$")));
-		}
-		
-		catch (Exception e) 
-		{
-		}
-		
-		try
-		{
-			usedPrice = fetchItem(requestUrl, "LowestUsedPrice");
-			if (usedPrice != null)    
-				if (!usedPrice.equals("Too low to display"))
-					prices.put("Used price", usedPrice.substring(usedPrice.indexOf("$")));
-		}
-		catch (Exception e) 
-		{
-		}
-		
-		try
-		{
-			listPrice = fetchItem(requestUrl, "ListPrice");
-			if (listPrice != null)    
-				if (!listPrice.equals("Too low to display"))
-					prices.put("List price", listPrice.substring(listPrice.indexOf("$")));
-		}
-		catch (Exception e) 
-		{
+			SignedRequestsHelper helper = null;
+	        try
+	        {
+	            helper = SignedRequestsHelper.getInstance(endpoint, awsAccessKey, awsSecretKey);
+	        }
+	        
+	        catch (Exception e)
+	        {
+	            e.printStackTrace();
+	        }
+	        
+	        Map<String, String> params = new HashMap<String, String>();
+	        params.put("Service", "AWSECommerceService");
+	        params.put("Version", "2013-08-01");
+	        params.put("Operation", "ItemLookup");
+	        params.put("IdType", "ASIN");
+	        params.put("ItemId", asin);
+	        params.put("ResponseGroup", "Large");
+	        params.put("AssociateTag", "zebra02a-20");
+	        params.put("Sort", "relevancerank");
+	        requestUrl = helper.sign(params);
 		}
 				
-		product.putTop("price", prices);
-		product.putTop("product_name", title);
-		product.putTop("asin", asin);
-		product.putTop("category", category);
-		        
-		reviewsUrl = this.constructProductReviewUrl(asin);
-		
-		try 
-		{
-			org.jsoup.nodes.Document doc = Jsoup.connect(reviewsUrl).get();
-				averageRating = Double.parseDouble((doc.select("span.asinReviewsSummary span[class^=sWSprite s_star] span").first().text()).substring(0,3));
-		    
-		} 
-		catch (Exception e) {
-			Log.warn("Jsoup preliminary scraping failed", e);
-		}
-		
-		TreeMap<String, Object> amazonOtherInfo = new TreeMap<String, Object>();
-		amazonOtherInfo.put("name", "AmazonProcessor_initial");
-		amazonOtherInfo.put("description", Jsoup.parse(description).text());
-		if (averageRating != 0.0)
-		   product.putTop("average_rating", averageRating);
-		product.add(amazonOtherInfo);
+			try {
+				category = fetchItem(requestUrl, "ProductGroup");
+			} catch (Exception e) {
+				categoryFailed = true;
+			}
+			
+			try
+			{
+			title = fetchItem(requestUrl, "Title");
+			} 
+			catch (Exception e)
+			{
+				if (categoryFailed) {
+					throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_BOTH,
+						"Failed to fetch category and name", e);
+				}
+				
+				throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_NAME,
+						"Failed to fetch name", e);
+			}
+			
+			if (categoryFailed) {
+				throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_CATEGORY,
+						"Failed to fetch category", null);
+			}
+			
+			try
+			{
+			description = fetchItem(requestUrl, "Content");
+			}
+			catch (Exception e)
+			{
+				Log.warn("AmazonProcessor", "Failed to fetch description");
+			}
+			
+			try
+			{
+			
+			if (!useAsin) {	
+			if (!(((String) this.getProduct().getTop("product_type")).toUpperCase()).equals("ASIN"))
+				asin = fetchItem(requestUrl, "ASIN");
+			else
+				asin = itemID;
+			}
+			}
+			catch (Exception e)
+			{
+				throw new ProcessingException("AmazonProcessor", Requests.ESSENTIAL_BOTH,
+						"Failed to fetch ASIN", e);
+			}
+			try 
+			{
+				salePrice = fetchItem(requestUrl, "SalePrice");
+				if (salePrice != null)    
+					if (!salePrice.equals("Too low to display"))
+						prices.put("Sale price", salePrice.substring(salePrice.indexOf("$")));
+			}
+			
+			catch (Exception e) 
+			{
+			}
+			
+			try
+			{
+				newPrice = fetchItem(requestUrl, "LowestNewPrice");
+				if (newPrice != null)    
+					if (!newPrice.equals("Too low to display"))
+						prices.put("New price", newPrice.substring(newPrice.indexOf("$")));
+			}
+			
+			catch (Exception e) 
+			{
+			}
+			
+			try
+			{
+				usedPrice = fetchItem(requestUrl, "LowestUsedPrice");
+				if (usedPrice != null)    
+					if (!usedPrice.equals("Too low to display"))
+						prices.put("Used price", usedPrice.substring(usedPrice.indexOf("$")));
+			}
+			catch (Exception e) 
+			{
+			}
+			
+			try
+			{
+				listPrice = fetchItem(requestUrl, "ListPrice");
+				if (listPrice != null)    
+					if (!listPrice.equals("Too low to display"))
+						prices.put("List price", listPrice.substring(listPrice.indexOf("$")));
+			}
+			catch (Exception e) 
+			{
+			}
+					
+			product.putTop("price", prices);
+			product.putTop("product_name", title);
+			product.putTop("asin", asin);
+			product.putTop("category", category);
+			        
+			reviewsUrl = this.constructProductReviewUrl(asin);
+			
+			try 
+			{
+				org.jsoup.nodes.Document doc = Jsoup.connect(reviewsUrl).get();
+					averageRating = Double.parseDouble((doc.select("span.asinReviewsSummary span[class^=sWSprite s_star] span").first().text()).substring(0,3));
+			    
+			} 
+			catch (Exception e) {
+				Log.warn("Jsoup preliminary scraping failed", e);
+			}
+			
+			TreeMap<String, Object> amazonOtherInfo = new TreeMap<String, Object>();
+			amazonOtherInfo.put("name", "AmazonProcessor_initial");
+			amazonOtherInfo.put("description", Jsoup.parse(description).text());
+			if (averageRating != 0.0)
+			   product.putTop("average_rating", averageRating);
+			product.add(amazonOtherInfo);
 	}
 }
