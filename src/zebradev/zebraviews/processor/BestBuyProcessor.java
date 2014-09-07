@@ -1,12 +1,14 @@
 package zebradev.zebraviews.processor;
 
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import zebradev.zebraviews.common.ConfigManager;
@@ -57,7 +59,7 @@ public class BestBuyProcessor extends Processor{
 			throw new ProcessingException("BestBuyProcessor", Requests.ESSENTIAL_BOTH,
 					"Failed to fetch API Key", null);
 		
-		if (((String) this.getProduct().getTop("product_type")).toUpperCase().equals("ISBN"))
+		if (!((String) this.getProduct().getTop("product_type")).toUpperCase().equals("UPC"))
 			throw new ProcessingException("BestBuyProcessor", Requests.ESSENTIAL_BOTH,
 				"Failed to fetch category and name", null);
 
@@ -66,7 +68,7 @@ public class BestBuyProcessor extends Processor{
 		String name = "";
 		String description = "";
 		Double averageRating = 0.0;
-		//String includedItemList = "";
+		String includedItemList = "";
 		String category = "";
 		Boolean categoryFailed = false;
 		

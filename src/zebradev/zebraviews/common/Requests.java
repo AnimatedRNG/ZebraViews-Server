@@ -22,7 +22,7 @@ import java.util.TreeMap;
 public enum Requests {
 
 	LOGIN ("login"), SIGNUP ("signup"), PRODUCT_SEARCH ("product_search"),
-	UPC_A ("UPC_A"), UPC_E ("UPC_E"), ISBN ("isbn"), EAN ("ean"), JAN ("jan"),
+	UPC_A ("UPC_A"), UPC_E ("UPC_E"), ISBN ("isbn"), EAN_13 ("EAN_13"), JAN ("jan"),
 	LOGIN_RESPONSE ("login_response"), STATUS_SUCCESS ("SUCCESS"),
 	STATUS_FAILURE ("FAILURE"), SIGNUP_RESPONSE ("signup_response"),
 	ESSENTIAL_NAME ("name"), ESSENTIAL_CATEGORY ("category"), ESSENTIAL_BOTH ("both"), 

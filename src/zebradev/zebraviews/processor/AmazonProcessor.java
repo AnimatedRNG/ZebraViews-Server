@@ -97,6 +97,9 @@ public class AmazonProcessor extends Processor
         if (productType.equals(Requests.UPC_A.value) || productType.equals(Requests.UPC_E.value))
         	productType = productType.substring(0, 3);
         
+        if (productType.equals(Requests.EAN_13.value))
+        	productType = (Requests.ISBN.value).toUpperCase();
+        
         Map<String, String> params = new HashMap<String, String>();
         params.put("Service", "AWSECommerceService");
         params.put("Version", "2013-08-01");

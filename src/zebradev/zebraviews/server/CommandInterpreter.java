@@ -120,7 +120,7 @@ public class CommandInterpreter {
 						Log.warn("Client already running!");
 						return;
 					}
-					this.clientManager = new ClientManager(new ClientRequestListener(), null, null);
+					this.clientManager = new ClientManager(new ClientRequestListener());
 				} catch (Exception e) {
 					Log.error("Exception occurred connecting client!", e);
 					Log.warn("Connection was not established");
